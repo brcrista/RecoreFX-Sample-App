@@ -1,6 +1,8 @@
 # RecoreFX sample app
 
-This sample app is to test and demo the features of [RecoreFX](https://github.com/brcrista/RecoreFX).
+[![CI](https://github.com/brcrista/RecoreFX-Sample-App/workflows/CI/badge.svg)](https://github.com/recorefx/RecoreFX-Sample-App/actions?query=workflow%3ACI)
+
+This sample app is to test and demo the features of [RecoreFX](https://github.com/recorefx/RecoreFX).
 
 The app syncs files between two file system subtrees.
 The [service](SyncService/) runs in one subtree and the [client](SyncClient/) runs on the other.
