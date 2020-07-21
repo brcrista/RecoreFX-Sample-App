@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SyncService.Models
+namespace FileSync.Service.Models
 {
     /// <summary>
     /// Manages a collection of hyperlinks according to the JSON Hypertext Application Language (HAL).

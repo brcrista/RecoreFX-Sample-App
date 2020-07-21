@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Common", "FileSync.Common\FileSync.Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncClient", "SyncClient\SyncClient.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Client", "FileSync.Client\FileSync.Client.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncService", "SyncService\SyncService.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Service", "FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace SyncService.Controllers
+namespace FileSync.Service.Controllers
 {
     [ApiController]
     [Route("files/content")]

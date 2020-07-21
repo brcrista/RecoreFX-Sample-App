@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SyncService.Models
+namespace FileSync.Service.Models
 {
     public sealed class File
     {
