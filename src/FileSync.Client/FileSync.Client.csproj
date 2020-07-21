@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Common/Common.csproj" />
+    <ProjectReference Include="../FileSync.Common/FileSync.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Recore;
 
-namespace SyncService.Controllers
+namespace FileSync.Service.Controllers
 {
     [ApiController]
     [Route("files/info")]

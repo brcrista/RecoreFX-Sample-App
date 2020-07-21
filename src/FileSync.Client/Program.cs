@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SyncClient
+namespace FileSync.Client
 {
     static class Program
     {
