@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 using Recore;
 
@@ -15,13 +16,14 @@ namespace FileSync.Service.Models
         {
             Path = path;
             LastWriteTimeUtc = lastWriteTimeUtc;
-            _links = links;
+            Links = links;
         }
 
         public Path Path { get; }
 
         public DateTime LastWriteTimeUtc { get; }
 
-        public HAL _links { get; } 
+        [JsonPropertyName("_links")]
+        public HAL Links { get; }
     }
 }
