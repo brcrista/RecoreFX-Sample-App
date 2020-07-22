@@ -22,7 +22,7 @@ namespace FileSync.Service.Controllers
                 var selfUri = new AbsoluteUri(HttpContext.Request.GetEncodedUrl()).Combine(fileInfo.Name);
 
                 yield return new Models.File(
-                    path: fileInfo.Name,
+                    path: new Models.Path(fileInfo.Name),
                     lastWriteTimeUtc: fileInfo.LastWriteTimeUtc,
                     links: new Models.HAL(selfUri));
             }
