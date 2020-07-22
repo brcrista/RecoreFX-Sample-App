@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,8 +9,9 @@
     <ProjectReference Include="../FileSync.Common/FileSync.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="RecoreFX" Version="0.5.0" />
+  <ItemGroup><!-- <PackageReference Include="RecoreFX" Version="0.5.0" /> -->
+  
+    <ProjectReference Include="..\..\..\RecoreFX\src\Recore.csproj" />
   </ItemGroup>
 
 </Project>
