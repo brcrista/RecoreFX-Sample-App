@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace FileSync.Service.Models
 {
@@ -21,16 +20,15 @@ namespace FileSync.Service.Models
                 Href = href;
             }
 
-            [Required, Url] // TODO what happens without this?
             public Uri Href { get; set; }
 
             public bool? Templated { get; set; }
 
-            public string? Type { get; set; }
+            public string Type { get; set; }
 
-            public string? Deprecation { get; set; }
+            public string Deprecation { get; set; }
 
-            public string? Name { get; set; }
+            public string Name { get; set; }
         }
 
         public HAL(Uri self)
