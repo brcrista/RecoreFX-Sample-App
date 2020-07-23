@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -13,12 +12,18 @@ namespace FileSync.Service.Controllers
     [Route("files/info")]
     public sealed class FileInfoController : ControllerBase
     {
+        private readonly Services.IFileService fileService;
+
+        public FileInfoController(Services.IFileService fileService)
+        {
+            this.fileService = fileService;
+        }
+
         [HttpGet]
         public IEnumerable<Models.File> GetFiles()
         {
-            foreach (var file in Directory.EnumerateFiles("."))
+            foreach (var fileInfo in fileService.GetFiles())
             {
-                var fileInfo = new FileInfo(file);
                 var selfUri = new AbsoluteUri(HttpContext.Request.GetEncodedUrl()).Combine(fileInfo.Name);
 
                 yield return new Models.File(

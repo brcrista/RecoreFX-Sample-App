@@ -19,6 +19,8 @@ namespace FileSync.Service.Models
             Links = links;
         }
 
+        public Token Test { get; } = new Token("hello");
+
         public Path Path { get; }
 
         public DateTime LastWriteTimeUtc { get; }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using FileSync.Service.Services;
+
 namespace FileSync.Service
 {
     public sealed class Startup
@@ -10,6 +12,7 @@ namespace FileSync.Service
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddTransient<IFileService, FileService>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }
