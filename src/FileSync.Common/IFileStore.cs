@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace FileSync.Service.Services
+namespace FileSync.Common
 {
-    public interface IFileService
+    public interface IFileStore
     {
         public IEnumerable<FileInfo> GetFiles();
     }

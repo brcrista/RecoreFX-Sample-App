@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.IO;
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using FileSync.Service.Services;
+using FileSync.Common;
 
 namespace FileSync.Service
 {
@@ -12,7 +14,7 @@ namespace FileSync.Service
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddTransient<IFileService, FileService>()
+                .AddTransient<IFileStore, FileStore>(sp => new FileStore(new Filepath(Directory.GetCurrentDirectory())))
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }

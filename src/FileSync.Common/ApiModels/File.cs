@@ -5,23 +5,16 @@ using Recore;
 
 namespace FileSync.Common.ApiModels
 {
-    public class Path : Of<string>
-    {
-        public Path(string value) => Value = value;
-    }
-
     public sealed class File
     {
-        public File(Path path, DateTime lastWriteTimeUtc, HAL links)
+        public File(Filepath path, DateTime lastWriteTimeUtc, HAL links)
         {
             Path = path;
             LastWriteTimeUtc = lastWriteTimeUtc;
             Links = links;
         }
 
-        public Token Test { get; } = new Token("hello");
-
-        public Path Path { get; }
+        public Filepath Path { get; }
 
         public DateTime LastWriteTimeUtc { get; }
 
