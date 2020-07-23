@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 using Recore;
 
-namespace FileSync.Service.Models
+namespace FileSync.Common.ApiModels
 {
     public class Path : Of<string>
     {
