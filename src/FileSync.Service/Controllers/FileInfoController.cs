@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Recore;
 
 using FileSync.Common;
-using FileSync.Common.ApiModels;
+using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Service.Controllers
 {
@@ -23,16 +23,14 @@ namespace FileSync.Service.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<File> GetFiles()
+        public IEnumerable<ApiModels.File> GetFiles()
         {
             foreach (var fileInfo in fileStore.GetFiles())
             {
-                var selfUri = new AbsoluteUri(HttpContext.Request.GetEncodedUrl()).Combine(fileInfo.Name);
-
-                yield return new File(
-                    path: new Filepath(fileInfo.Name),
-                    lastWriteTimeUtc: fileInfo.LastWriteTimeUtc,
-                    links: new HAL(selfUri));
+                var requestUrl = HttpContext.Request.GetEncodedUrl();
+                yield return ApiModels.File.FromFileInfo(
+                    fileInfo,
+                    selfUri: new AbsoluteUri(requestUrl).Combine(fileInfo.Name));
             }
         }
     }

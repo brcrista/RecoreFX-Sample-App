@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FileSync.Common
 {
@@ -18,6 +19,16 @@ namespace FileSync.Common
             {
                 yield return new FileInfo(file);
             }
+        }
+
+        public Task<Stream> ReadFileAsync(Filepath path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task WriteFileAsync(Filepath path, Stream content)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
