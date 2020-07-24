@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json.Serialization;
-
 using Recore;
 
 namespace FileSync.Common.ApiModels
