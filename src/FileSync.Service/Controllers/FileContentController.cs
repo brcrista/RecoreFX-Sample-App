@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("files/content")]
-    public sealed class FileContentController : ControllerBase
+    [Route("api/v1/files/content")]
+    public sealed class FileContentV1Controller : ControllerBase
     {
         [HttpGet]
         public Task<IActionResult> DownloadFileAsync([FromRoute] string path)

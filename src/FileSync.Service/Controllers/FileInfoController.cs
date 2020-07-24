@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -7,24 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 
 using Recore;
 
+using FileSync.Common;
+using ApiModels = FileSync.Common.ApiModels;
+
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("files/info")]
-    public sealed class FileInfoController : ControllerBase
+    [Route("api/v1/files/info")]
+    public sealed class FileInfoV1Controller : ControllerBase
     {
-        [HttpGet]
-        public IEnumerable<Models.File> GetFiles()
-        {
-            foreach (var file in Directory.EnumerateFiles("."))
-            {
-                var fileInfo = new FileInfo(file);
-                var selfUri = new AbsoluteUri(HttpContext.Request.GetEncodedUrl()).Combine(fileInfo.Name);
+        private readonly IFileStore fileStore;
 
-                yield return new Models.File(
-                    path: fileInfo.Name,
-                    lastWriteTimeUtc: fileInfo.LastWriteTimeUtc,
-                    links: new Models.HAL(selfUri));
+        public FileInfoV1Controller(IFileStore fileStore)
+        {
+            this.fileStore = fileStore;
+        }
+
+        [HttpGet]
+        public IEnumerable<ApiModels.File> GetFiles()
+        {
+            foreach (var fileInfo in fileStore.GetFiles())
+            {
+                var requestUrl = HttpContext.Request.GetEncodedUrl();
+                yield return ApiModels.File.FromFileInfo(
+                    fileInfo,
+                    selfUri: new AbsoluteUri(requestUrl).Combine(fileInfo.Name));
             }
         }
     }

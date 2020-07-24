@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace FileSync.Service.Models
+namespace FileSync.Common.ApiModels
 {
     /// <summary>
     /// Manages a collection of hyperlinks according to the JSON Hypertext Application Language (HAL).
     /// </summary>
     /// <remarks>
     /// The HAL specification only exists as an RFC draft (now expired): https://tools.ietf.org/html/draft-kelly-json-hal-08.
-    /// Note that there's no built-in way in ASP.NET Core to change the JSON property name of a type member in its JSON serialization,
-    /// so a <see cref="HAL" /> property should be named <c>_links</c>.
     /// </remarks>
     public sealed class HAL : Dictionary<string, HAL.Link>
     {
@@ -21,16 +18,15 @@ namespace FileSync.Service.Models
                 Href = href;
             }
 
-            [Required, Url] // TODO what happens without this?
             public Uri Href { get; set; }
 
             public bool? Templated { get; set; }
 
-            public string? Type { get; set; }
+            public string Type { get; set; }
 
-            public string? Deprecation { get; set; }
+            public string Deprecation { get; set; }
 
-            public string? Name { get; set; }
+            public string Name { get; set; }
         }
 
         public HAL(Uri self)
