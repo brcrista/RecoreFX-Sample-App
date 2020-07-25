@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FileSync.Common;
+using Recore;
 using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -28,8 +30,20 @@ namespace FileSync.Client
             var filesOnService = await fileService.GetAllFileInfoAsync();
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
-            // Print a warning for conflicts
-            var conflicts = compareFiles.Conflicts();
+            // Print a message for conflicts
+            foreach (var conflict in compareFiles.Conflicts())
+            {
+                static string WhoseFile(Conflict conflict)
+                    => conflict.ChosenVersion switch
+                    {
+                        ChosenVersion.Client => "client",
+                        ChosenVersion.Server => "server",
+                        _ => throw new InvalidOperationException(conflict.ToString())
+                    };
+
+                yield return $"'{conflict.ClientFile.Path}' exists on both the client and the server."
+                    + $" Choosing the {WhoseFile(conflict)}'s version.";
+            }
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
