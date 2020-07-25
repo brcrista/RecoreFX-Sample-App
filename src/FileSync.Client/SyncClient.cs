@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 using FileSync.Common;
 using ApiModels = FileSync.Common.ApiModels;
@@ -10,34 +10,31 @@ namespace FileSync.Client
 {
     public sealed class SyncClient
     {
+        private readonly IConsoleUI consoleUI;
         private readonly IFileStore fileStore;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
+            IConsoleUI consoleUI,
             IFileStore fileStore,
             IFileServiceHttpClient fileService)
         {
+            this.consoleUI = consoleUI;
             this.fileStore = fileStore;
             this.fileService = fileService;
         }
 
-        public async IAsyncEnumerable<LogMessage> RunAsync()
+        public async Task RunAsync()
         {
             // Check the files in our directory
             var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
-            yield return Verbose("Files on the client:");
-            foreach (var message in LogFiles(Verbose, filesOnClient))
-            {
-                yield return message;
-            }
+            consoleUI.Verbose("Files on the client:");
+            ListFiles(consoleUI.Verbose, filesOnClient);
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            yield return Verbose("Files on the service:");
-            foreach (var message in LogFiles(Verbose, filesOnService))
-            {
-                yield return message;
-            }
+            consoleUI.Verbose("Files on the service:");
+            ListFiles(consoleUI.Verbose, filesOnService);
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
@@ -52,7 +49,7 @@ namespace FileSync.Client
                         _ => throw new InvalidOperationException(conflict.ToString())
                     };
 
-                yield return Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
+                consoleUI.Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
                     + $" Choosing the {WhoseFile(conflict)}'s version.");
             }
 
@@ -73,52 +70,33 @@ namespace FileSync.Client
             }
 
             // Print summary
-            yield return Info("===== Summary =====");
+            consoleUI.Info("===== Summary =====");
 
             // List new files
-            yield return Info($"New files: {filesToDownload.Count}"); // TODO
-            foreach (var message in LogFiles(Info, filesToDownload))
-            {
-                yield return message;
-            }
+            consoleUI.Info($"New files: {filesToDownload.Count}"); // TODO
+            ListFiles(consoleUI.Info, filesToDownload);
 
             // List uploaded files
-            yield return Info($"Uploaded files: {filesToUpload.Count}");
-            foreach (var message in LogFiles(Info, filesToUpload))
-            {
-                yield return message;
-            }
+            consoleUI.Info($"Uploaded files: {filesToUpload.Count}");
+            ListFiles(consoleUI.Info, filesToUpload);
+
 
             // List modified files
-            yield return Info($"Modified files: {filesToDownload.Count}"); // TODO
-            foreach (var message in LogFiles(Info, filesToDownload))
-            {
-                yield return message;
-            }
+            consoleUI.Info($"Modified files: {filesToDownload.Count}"); // TODO
+            ListFiles(consoleUI.Info, filesToDownload);
         }
 
-        #region log helpers
-        private static LogMessage CreateLogMessage(LogLevel level, string message)
-            => new LogMessage { Level = level, Message = message };
-
-        private static LogMessage Verbose(string message)
-            => CreateLogMessage(LogLevel.Debug, message);
-
-        private static LogMessage Info(string message)
-            => CreateLogMessage(LogLevel.Information, message);
-
-        private static IEnumerable<LogMessage> LogFiles(Func<string, LogMessage> logLevel, IEnumerable<ApiModels.File> files)
+        private static void ListFiles(Action<string> channel, IEnumerable<ApiModels.File> files)
         {
+            static string Indent(string source) => "  " + source;
+
             foreach (var file in files)
             {
-                yield return logLevel(Indent(file.Path.Value));
+                channel(Indent(file.Path.Value));
             }
 
             // Log a blank line
-            yield return logLevel(string.Empty);
+            channel(string.Empty);
         }
-
-        private static string Indent(string source) => "  " + source;
-        #endregion
     }
 }
