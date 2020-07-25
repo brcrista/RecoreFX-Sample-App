@@ -22,7 +22,7 @@ namespace FileSync.Client
                 };
 
                 var syncClient = new SyncClient(
-                     fileStore: new FileStore(new Filepath(Directory.GetCurrentDirectory())),
+                     fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
                      fileService: new FileServiceHttpClient(httpClient));
 
                 await foreach (var resultLine in syncClient.RunAsync())
