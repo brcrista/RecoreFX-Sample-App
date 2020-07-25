@@ -7,11 +7,11 @@ namespace FileSync.Common
     /// <summary>
     /// A file store backed by the local file system.
     /// </summary>
-    public sealed class FileSystemFileStore : IFileStore
+    public sealed class FileSystemStore : IFileStore
     {
         public Filepath Filepath { get; }
 
-        public FileSystemFileStore(Filepath filepath)
+        public FileSystemStore(Filepath filepath)
         {
             Filepath = filepath;
         }

@@ -16,10 +16,10 @@ namespace FileSync.Service
         {
             var createFileStore = new Composer<IServiceProvider, string>(_ => Directory.GetCurrentDirectory())
                 .Then(x => new Filepath(x))
-                .Then(x => new FileSystemFileStore(x));
+                .Then(x => new FileSystemStore(x));
 
             services
-                .AddTransient<IFileStore, FileSystemFileStore>(createFileStore.Func)
+                .AddTransient<IFileStore, FileSystemStore>(createFileStore.Func)
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }

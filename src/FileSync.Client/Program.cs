@@ -24,7 +24,7 @@ namespace FileSync.Client
 
                 var syncClient = new SyncClient(
                     view: new ConsoleView { IsVerbose = true },
-                    fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
+                    fileStore: new FileSystemStore(new Filepath(Directory.GetCurrentDirectory())),
                     fileService: new FileServiceHttpClient(httpClient));
 
                 await syncClient.RunAsync();
