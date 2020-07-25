@@ -1,26 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 using FileSync.Client.UI;
 using FileSync.Common;
-using ApiModels = FileSync.Common.ApiModels;
+using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
+    /// <summary>
+    /// Implements the high-level logic for the file sync client.
+    /// </summary>
     public sealed class SyncClient
     {
-        private readonly IOutputChannels outputChannels;
+        private readonly ConsoleView consoleView;
         private readonly IFileStore fileStore;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
-            IOutputChannels outputChannels,
+            ConsoleView consoleView,
             IFileStore fileStore,
             IFileServiceHttpClient fileService)
         {
-            this.outputChannels = outputChannels;
+            this.consoleView = consoleView;
             this.fileStore = fileStore;
             this.fileService = fileService;
         }
@@ -28,29 +29,17 @@ namespace FileSync.Client
         public async Task RunAsync()
         {
             // Check the files in our directory
-            var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
-            ListFiles(outputChannels.Verbose, "Files on the client:", filesOnClient);
+            var filesOnClient = fileStore.GetFiles().Select(File.FromFileInfo).ToList();
+            consoleView.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            ListFiles(outputChannels.Verbose, "Files on the service:", filesOnService);
+            consoleView.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a message for conflicts
-            foreach (var conflict in compareFiles.Conflicts())
-            {
-                static string WhoseFile(Conflict conflict)
-                    => conflict.ChosenVersion switch
-                    {
-                        ChosenVersion.Client => "client",
-                        ChosenVersion.Service => "service",
-                        _ => throw new InvalidOperationException(conflict.ToString())
-                    };
-
-                outputChannels.Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
-                    + $" Choosing the {WhoseFile(conflict)}'s version.");
-            }
+            consoleView.Info(new ConflictsViewComponent(compareFiles.Conflicts()));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
@@ -69,30 +58,10 @@ namespace FileSync.Client
             }
 
             // Print summary
-            outputChannels.Info("===== Summary =====");
-
-            // List new files
-            ListFiles(outputChannels.Info, $"New files: {filesToDownload.Count}", filesToDownload); // TODO
-
-            // List uploaded files
-            ListFiles(outputChannels.Info, $"Uploaded files: {filesToUpload.Count}", filesToUpload);
-
-            // List modified files
-            ListFiles(outputChannels.Info, $"Modified files: {filesToDownload.Count}", filesToDownload); // TODO
-        }
-
-        private static void ListFiles(Action<string> channel, string message, IEnumerable<ApiModels.File> files)
-        {
-            static string Indent(string source) => "  " + source;
-
-            channel(message);
-            foreach (var file in files)
-            {
-                channel(Indent(file.Path.Value));
-            }
-
-            // Log a blank line
-            channel(string.Empty);
+            consoleView.Info(new SummaryViewComponent(
+                newFiles: filesToDownload, // TODO
+                changedFiles: filesToDownload, // TODO
+                sentFiles: filesToUpload));
         }
     }
 }
