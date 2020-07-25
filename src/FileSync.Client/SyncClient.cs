@@ -28,13 +28,11 @@ namespace FileSync.Client
         {
             // Check the files in our directory
             var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
-            consoleUI.Verbose("Files on the client:");
-            ListFiles(consoleUI.Verbose, filesOnClient);
+            ListFiles(consoleUI.Verbose, "Files on the client:", filesOnClient);
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            consoleUI.Verbose("Files on the service:");
-            ListFiles(consoleUI.Verbose, filesOnService);
+            ListFiles(consoleUI.Verbose, "Files on the service:", filesOnService);
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
@@ -73,23 +71,20 @@ namespace FileSync.Client
             consoleUI.Info("===== Summary =====");
 
             // List new files
-            consoleUI.Info($"New files: {filesToDownload.Count}"); // TODO
-            ListFiles(consoleUI.Info, filesToDownload);
+            ListFiles(consoleUI.Info, $"New files: {filesToDownload.Count}", filesToDownload); // TODO
 
             // List uploaded files
-            consoleUI.Info($"Uploaded files: {filesToUpload.Count}");
-            ListFiles(consoleUI.Info, filesToUpload);
-
+            ListFiles(consoleUI.Info, $"Uploaded files: {filesToUpload.Count}", filesToUpload);
 
             // List modified files
-            consoleUI.Info($"Modified files: {filesToDownload.Count}"); // TODO
-            ListFiles(consoleUI.Info, filesToDownload);
+            ListFiles(consoleUI.Info, $"Modified files: {filesToDownload.Count}", filesToDownload); // TODO
         }
 
-        private static void ListFiles(Action<string> channel, IEnumerable<ApiModels.File> files)
+        private static void ListFiles(Action<string> channel, string message, IEnumerable<ApiModels.File> files)
         {
             static string Indent(string source) => "  " + source;
 
+            channel(message);
             foreach (var file in files)
             {
                 channel(Indent(file.Path.Value));
