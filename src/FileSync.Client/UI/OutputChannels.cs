@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FileSync.Client
+namespace FileSync.Client.UI
 {
-    public sealed class ConsoleUI : IConsoleUI
+    public sealed class OutputChannels : IOutputChannels
     {
         public void Error(string message) => Console.Error.WriteLine(message);
 

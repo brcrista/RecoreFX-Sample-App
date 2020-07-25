@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Recore;
 
+using FileSync.Client.UI;
 using FileSync.Common;
 
 namespace FileSync.Client
@@ -22,7 +23,7 @@ namespace FileSync.Client
                 };
 
                 var syncClient = new SyncClient(
-                    consoleUI: new ConsoleUI(),
+                    outputChannels: new OutputChannels(),
                     fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
                     fileService: new FileServiceHttpClient(httpClient));
 

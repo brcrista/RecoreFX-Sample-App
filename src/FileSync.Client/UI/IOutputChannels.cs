@@ -1,6 +1,6 @@
-﻿namespace FileSync.Client
+﻿namespace FileSync.Client.UI
 {
-    public interface IConsoleUI
+    public interface IOutputChannels
     {
         void Verbose(string message);
 

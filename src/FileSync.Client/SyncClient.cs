@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using FileSync.Client.UI;
 using FileSync.Common;
 using ApiModels = FileSync.Common.ApiModels;
 
@@ -10,16 +11,16 @@ namespace FileSync.Client
 {
     public sealed class SyncClient
     {
-        private readonly IConsoleUI consoleUI;
+        private readonly IOutputChannels outputChannels;
         private readonly IFileStore fileStore;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
-            IConsoleUI consoleUI,
+            IOutputChannels outputChannels,
             IFileStore fileStore,
             IFileServiceHttpClient fileService)
         {
-            this.consoleUI = consoleUI;
+            this.outputChannels = outputChannels;
             this.fileStore = fileStore;
             this.fileService = fileService;
         }
@@ -28,11 +29,11 @@ namespace FileSync.Client
         {
             // Check the files in our directory
             var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
-            ListFiles(consoleUI.Verbose, "Files on the client:", filesOnClient);
+            ListFiles(outputChannels.Verbose, "Files on the client:", filesOnClient);
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            ListFiles(consoleUI.Verbose, "Files on the service:", filesOnService);
+            ListFiles(outputChannels.Verbose, "Files on the service:", filesOnService);
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
@@ -47,7 +48,7 @@ namespace FileSync.Client
                         _ => throw new InvalidOperationException(conflict.ToString())
                     };
 
-                consoleUI.Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
+                outputChannels.Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
                     + $" Choosing the {WhoseFile(conflict)}'s version.");
             }
 
@@ -68,16 +69,16 @@ namespace FileSync.Client
             }
 
             // Print summary
-            consoleUI.Info("===== Summary =====");
+            outputChannels.Info("===== Summary =====");
 
             // List new files
-            ListFiles(consoleUI.Info, $"New files: {filesToDownload.Count}", filesToDownload); // TODO
+            ListFiles(outputChannels.Info, $"New files: {filesToDownload.Count}", filesToDownload); // TODO
 
             // List uploaded files
-            ListFiles(consoleUI.Info, $"Uploaded files: {filesToUpload.Count}", filesToUpload);
+            ListFiles(outputChannels.Info, $"Uploaded files: {filesToUpload.Count}", filesToUpload);
 
             // List modified files
-            ListFiles(consoleUI.Info, $"Modified files: {filesToDownload.Count}", filesToDownload); // TODO
+            ListFiles(outputChannels.Info, $"Modified files: {filesToDownload.Count}", filesToDownload); // TODO
         }
 
         private static void ListFiles(Action<string> channel, string message, IEnumerable<ApiModels.File> files)
