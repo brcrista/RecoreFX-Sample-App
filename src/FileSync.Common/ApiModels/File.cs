@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json.Serialization;
 using Recore;
@@ -24,7 +25,7 @@ namespace FileSync.Common.ApiModels
                 Path = new Filepath(fileInfo.Name),
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
                 Links = selfUri.Switch(
-                    uri => HAL.Create(uri),
+                    uri => HAL.Create(uri, new Dictionary<string, Uri> { ["content"] = uri.Combine("content") }),
                     () => null)
             };
     }

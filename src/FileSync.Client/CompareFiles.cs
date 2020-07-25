@@ -7,8 +7,8 @@ namespace FileSync.Client
 {
     public sealed class CompareFiles
     {
-        private IReadOnlyList<File> clientFiles;
-        private IReadOnlyList<File> serverFiles;
+        private readonly IReadOnlyList<File> clientFiles;
+        private readonly IReadOnlyList<File> serverFiles;
 
         public CompareFiles(IEnumerable<File> clientFiles, IEnumerable<File> serverFiles)
         {
@@ -19,13 +19,13 @@ namespace FileSync.Client
         public IEnumerable<File> FilesToDownload()
         {
             // TODO
-            return Enumerable.Empty<File>();
+            return serverFiles;
         }
 
         public IEnumerable<File> FilesToUpload()
         {
             // TODO
-            return Enumerable.Empty<File>();
+            return clientFiles;
         }
 
         public IEnumerable<Conflict> Conflicts()

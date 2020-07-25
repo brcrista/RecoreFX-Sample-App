@@ -35,7 +35,12 @@ namespace FileSync.Client
 
         public async Task<Stream> GetFileContentAsync(ApiModels.File file)
         {
-            var response = await httpClient.GetAsync(file.Links["self"].Href);
+            var response = await httpClient.GetAsync(file.Links["content"].Href);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(response.ReasonPhrase);
+            }
+
             return await response.Content.ReadAsStreamAsync();
         }
 
