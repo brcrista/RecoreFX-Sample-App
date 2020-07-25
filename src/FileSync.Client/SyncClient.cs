@@ -1,60 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using System.Threading.Tasks;
 
+using FileSync.Client.UI;
 using FileSync.Common;
-using ApiModels = FileSync.Common.ApiModels;
+using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
+    /// <summary>
+    /// Implements the high-level logic for the file sync client.
+    /// </summary>
     public sealed class SyncClient
     {
+        private readonly ITextView view;
         private readonly IFileStore fileStore;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
+            ITextView view,
             IFileStore fileStore,
             IFileServiceHttpClient fileService)
         {
+            this.view = view;
             this.fileStore = fileStore;
             this.fileService = fileService;
         }
 
-        public async IAsyncEnumerable<LogMessage> RunAsync()
+        public async Task RunAsync()
         {
             // Check the files in our directory
-            var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
-            yield return Verbose("Files on the client:");
-            foreach (var message in LogFiles(Verbose, filesOnClient))
-            {
-                yield return message;
-            }
+            var filesOnClient = fileStore.GetFiles().Select(File.FromFileInfo).ToList();
+            view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            yield return Verbose("Files on the service:");
-            foreach (var message in LogFiles(Verbose, filesOnService))
-            {
-                yield return message;
-            }
+            view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a message for conflicts
-            foreach (var conflict in compareFiles.Conflicts())
-            {
-                static string WhoseFile(Conflict conflict)
-                    => conflict.ChosenVersion switch
-                    {
-                        ChosenVersion.Client => "client",
-                        ChosenVersion.Service => "service",
-                        _ => throw new InvalidOperationException(conflict.ToString())
-                    };
-
-                yield return Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
-                    + $" Choosing the {WhoseFile(conflict)}'s version.");
-            }
+            view.Info(new ConflictsViewComponent(compareFiles.Conflicts()));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
@@ -73,52 +58,10 @@ namespace FileSync.Client
             }
 
             // Print summary
-            yield return Info("===== Summary =====");
-
-            // List new files
-            yield return Info($"New files: {filesToDownload.Count}"); // TODO
-            foreach (var message in LogFiles(Info, filesToDownload))
-            {
-                yield return message;
-            }
-
-            // List uploaded files
-            yield return Info($"Uploaded files: {filesToUpload.Count}");
-            foreach (var message in LogFiles(Info, filesToUpload))
-            {
-                yield return message;
-            }
-
-            // List modified files
-            yield return Info($"Modified files: {filesToDownload.Count}"); // TODO
-            foreach (var message in LogFiles(Info, filesToDownload))
-            {
-                yield return message;
-            }
+            view.Info(new SummaryViewComponent(
+                newFiles: filesToDownload, // TODO
+                changedFiles: filesToDownload, // TODO
+                sentFiles: filesToUpload));
         }
-
-        #region log helpers
-        private static LogMessage CreateLogMessage(LogLevel level, string message)
-            => new LogMessage { Level = level, Message = message };
-
-        private static LogMessage Verbose(string message)
-            => CreateLogMessage(LogLevel.Debug, message);
-
-        private static LogMessage Info(string message)
-            => CreateLogMessage(LogLevel.Information, message);
-
-        private static IEnumerable<LogMessage> LogFiles(Func<string, LogMessage> logLevel, IEnumerable<ApiModels.File> files)
-        {
-            foreach (var file in files)
-            {
-                yield return logLevel(Indent(file.Path.Value));
-            }
-
-            // Log a blank line
-            yield return logLevel(string.Empty);
-        }
-
-        private static string Indent(string source) => "  " + source;
-        #endregion
     }
 }
