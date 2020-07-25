@@ -11,13 +11,17 @@ namespace FileSync.Client
     public sealed class FileServiceHttpClient : IFileServiceHttpClient
     {
         private readonly HttpClient httpClient;
+        private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
         public FileServiceHttpClient(HttpClient httpClient)
         {
             this.httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<ApiModels.File>> GetFileInfosAsync()
+        public async Task<IEnumerable<ApiModels.File>> GetAllFileInfoAsync()
         {
             var response = await httpClient.GetAsync("api/v1/files");
             if (!response.IsSuccessStatusCode)
@@ -25,11 +29,8 @@ namespace FileSync.Client
                 throw new HttpRequestException(response.ReasonPhrase);
             }
 
-            //var body = await response.Content.ReadAsStreamAsync();
-            //return await JsonSerializer.DeserializeAsync<IEnumerable<ApiModels.File>>(body);
-
-            var body = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<ApiModels.File>>(body);
+            var body = await response.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<IEnumerable<ApiModels.File>>(body, jsonOptions);
         }
 
         public async Task<Stream> GetFileContentAsync(ApiModels.File file)

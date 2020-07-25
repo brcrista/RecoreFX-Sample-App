@@ -8,7 +8,7 @@ namespace FileSync.Client
 {
     public interface IFileServiceHttpClient
     {
-        Task<IEnumerable<ApiModels.File>> GetFileInfosAsync();
+        Task<IEnumerable<ApiModels.File>> GetAllFileInfoAsync();
 
         Task<Stream> GetFileContentAsync(ApiModels.File file);
 
