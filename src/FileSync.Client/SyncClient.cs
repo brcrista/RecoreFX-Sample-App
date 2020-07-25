@@ -32,9 +32,9 @@ namespace FileSync.Client
             }
 
             // Call the service to get the files on it
-            var filesOnService = await fileService.GetAllFileInfoAsync();
+            var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
             yield return Verbose("Files on the service:");
-            foreach (var message in LogFiles(Verbose, filesOnClient))
+            foreach (var message in LogFiles(Verbose, filesOnService))
             {
                 yield return message;
             }

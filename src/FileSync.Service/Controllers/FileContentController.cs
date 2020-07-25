@@ -21,16 +21,15 @@ namespace FileSync.Service.Controllers
         [HttpGet]
         public async Task<IActionResult> DownloadFileAsync([FromRoute] string path)
         {
-            using var stream = await fileStore.ReadFileAsync(new Filepath(path));
+            var stream = await fileStore.ReadFileAsync(new Filepath(path));
             return File(stream, MediaTypeNames.Application.Octet);
         }
 
         [HttpPost]
         public async Task<IActionResult> UploadFileAsync([FromRoute] string path, [FromBody] byte[] contents)
         {
-            using var memoryStream = new MemoryStream(contents);
-            await fileStore.WriteFileAsync(new Filepath(path), memoryStream);
-            return CreatedAtAction(nameof(DownloadFileAsync), new { path });
+            await fileStore.WriteFileAsync(new Filepath(path), new MemoryStream(contents));
+            return CreatedAtAction(nameof(DownloadFileAsync), routeValues: new { path }, value: path);
         }
     }
 }
