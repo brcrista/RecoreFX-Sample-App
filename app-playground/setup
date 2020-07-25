@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+mkdir client
+echo "client-only file" > client/client-only.txt
+echo "shared file" > client/shared-file.txt
+
+mkdir service
+cp client/shared-file.txt service
+echo "service-only file" > service/service-only.txt

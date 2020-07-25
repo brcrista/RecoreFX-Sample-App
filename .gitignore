@@ -1,7 +1,13 @@
+# System files
 .DS_STORE
 
+# .NET build output
 .vs/
 bin/
 obj/
 
 *.csproj.user
+
+# App playground
+app-playground/client/
+app-playground/service/
