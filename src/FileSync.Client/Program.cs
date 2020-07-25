@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Recore;
 
 using FileSync.Common;
@@ -25,9 +26,15 @@ namespace FileSync.Client
                      fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
                      fileService: new FileServiceHttpClient(httpClient));
 
-                await foreach (var resultLine in syncClient.RunAsync())
+                await foreach (var logMessage in syncClient.RunAsync())
                 {
-                    Console.WriteLine(resultLine);
+                    var textWriter = logMessage.Level switch
+                    {
+                        LogLevel.Error => Console.Error,
+                        _ => Console.Out
+                    };
+
+                    textWriter.WriteLine(logMessage.Message);
                 }
 
                 return 0;
