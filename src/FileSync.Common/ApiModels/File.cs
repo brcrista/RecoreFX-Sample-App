@@ -7,28 +7,25 @@ namespace FileSync.Common.ApiModels
 {
     public sealed class File
     {
-        public File(Filepath path, DateTime lastWriteTimeUtc, Optional<HAL> links)
-        {
-            Path = path;
-            LastWriteTimeUtc = lastWriteTimeUtc;
-            Links = links.ValueOr(null);
-        }
+        public Filepath Path { get; set; }
 
-        public Filepath Path { get; }
-
-        public DateTime LastWriteTimeUtc { get; }
+        public DateTime LastWriteTimeUtc { get; set; }
 
         [JsonPropertyName("_links")]
-        public HAL Links { get; }
+        public HAL Links { get; set; }
 
         public static File FromFileInfo(FileInfo fileInfo)
             => FromFileInfo(fileInfo,
                 selfUri: Optional<AbsoluteUri>.Empty);
 
         public static File FromFileInfo(FileInfo fileInfo, Optional<AbsoluteUri> selfUri)
-            => new File(
-                path: new Filepath(fileInfo.Name),
-                lastWriteTimeUtc: fileInfo.LastWriteTimeUtc,
-                links: selfUri.OnValue(uri => new HAL(uri)));
+            => new File
+            {
+                Path = new Filepath(fileInfo.Name),
+                LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
+                Links = selfUri.Switch(
+                    uri => HAL.Create(uri),
+                    () => null)
+            };
     }
 }

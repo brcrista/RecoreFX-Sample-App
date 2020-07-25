@@ -10,7 +10,7 @@ using ApiModels = FileSync.Common.ApiModels;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("api/v1/files/info")]
+    [Route("api/v1/files")]
     public sealed class FileInfoV1Controller : ControllerBase
     {
         private readonly IFileStore fileStore;

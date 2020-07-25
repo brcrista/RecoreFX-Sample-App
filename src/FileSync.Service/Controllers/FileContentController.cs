@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("api/v1/files/content")]
+    [Route("api/v1/files/{path}/content")]
     public sealed class FileContentV1Controller : ControllerBase
     {
         [HttpGet]

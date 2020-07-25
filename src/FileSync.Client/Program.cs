@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Recore;
 
 using FileSync.Common;
 
@@ -12,9 +14,16 @@ namespace FileSync.Client
         {
             try
             {
+                // Use a single HTTP client for connection pooling
+                // (not that it really matters in this application)
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new AbsoluteUri("http://localhost:5000/")
+                };
+
                 var syncClient = new SyncClient(
                      fileStore: new FileStore(new Filepath(Directory.GetCurrentDirectory())),
-                     fileService: new FileServiceHttpClient());
+                     fileService: new FileServiceHttpClient(httpClient));
 
                 await foreach (var resultLine in syncClient.RunAsync())
                 {

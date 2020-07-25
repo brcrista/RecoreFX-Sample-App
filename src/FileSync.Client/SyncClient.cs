@@ -25,8 +25,7 @@ namespace FileSync.Client
             var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo);
 
             // Call the service to get the files on it
-            var filesOnService = await fileService.GetFileInfoAsync();
-
+            var filesOnService = await fileService.GetFileInfosAsync();
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a warning for conflicts
