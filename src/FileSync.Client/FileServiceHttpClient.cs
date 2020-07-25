@@ -23,25 +23,13 @@ namespace FileSync.Client
 
         public async Task<IEnumerable<ApiModels.File>> GetAllFileInfoAsync()
         {
-            var response = await httpClient.GetAsync("api/v1/files");
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException(response.ReasonPhrase);
-            }
-
-            var body = await response.Content.ReadAsStreamAsync();
+            var body = await httpClient.GetStreamAsync("api/v1/files");
             return await JsonSerializer.DeserializeAsync<IEnumerable<ApiModels.File>>(body, jsonOptions);
         }
 
         public async Task<Stream> GetFileContentAsync(ApiModels.File file)
         {
-            var response = await httpClient.GetAsync(file.Links["content"].Href);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException(response.ReasonPhrase);
-            }
-
-            return await response.Content.ReadAsStreamAsync();
+            return await httpClient.GetStreamAsync(file.Links["content"].Href);
         }
 
         public Task<ApiModels.File> PutFileContentAsync(Stream content)
