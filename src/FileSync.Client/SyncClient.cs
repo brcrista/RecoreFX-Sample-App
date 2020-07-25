@@ -54,7 +54,7 @@ namespace FileSync.Client
             foreach (var file in filesToUpload)
             {
                 var content = await fileStore.ReadFileAsync(file.Path);
-                await fileService.PutFileContentAsync(content);
+                await fileService.PutFileContentAsync(file.Path, content);
             }
 
             // Print summary

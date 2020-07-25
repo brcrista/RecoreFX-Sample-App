@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using FileSync.Common;
 using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -12,6 +13,6 @@ namespace FileSync.Client
 
         Task<Stream> GetFileContentAsync(ApiModels.File file);
 
-        Task<ApiModels.File> PutFileContentAsync(Stream content);
+        Task PutFileContentAsync(Filepath path, Stream content);
     }
 }
