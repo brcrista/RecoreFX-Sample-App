@@ -4,7 +4,7 @@ using FileSync.Common.ApiModels;
 
 namespace FileSync.Client.UI
 {
-    sealed class FileListViewComponent : IConsoleViewComponent
+    sealed class FileListViewComponent : ITextViewComponent
     {
         private readonly string label;
         private readonly IEnumerable<File> files;

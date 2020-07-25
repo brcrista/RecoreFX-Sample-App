@@ -4,7 +4,7 @@ using FileSync.Common.ApiModels;
 
 namespace FileSync.Client.UI
 {
-    sealed class SummaryViewComponent : IConsoleViewComponent
+    sealed class SummaryViewComponent : ITextViewComponent
     {
         private readonly IEnumerable<FileListViewComponent> fileListViews;
 

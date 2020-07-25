@@ -4,11 +4,11 @@ using Recore.Linq;
 
 namespace FileSync.Client.UI
 {
-    public sealed class ConsoleView
+    public sealed class ConsoleView : ITextView
     {
         public bool IsVerbose { get; set; }
 
-        public void Verbose(IConsoleViewComponent component)
+        public void Verbose(ITextViewComponent component)
         {
             if (IsVerbose)
             {
@@ -16,10 +16,10 @@ namespace FileSync.Client.UI
             }
         }
 
-        public void Info(IConsoleViewComponent component)
+        public void Info(ITextViewComponent component)
             => component.GetLines().ForEach(Console.WriteLine);
 
-        public void Error(IConsoleViewComponent component)
+        public void Error(ITextViewComponent component)
             => component.GetLines().ForEach(Console.Error.WriteLine);
     }
 }

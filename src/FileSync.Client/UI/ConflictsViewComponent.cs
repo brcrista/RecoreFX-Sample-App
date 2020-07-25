@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FileSync.Client.UI
 {
-    sealed class ConflictsViewComponent : IConsoleViewComponent
+    sealed class ConflictsViewComponent : ITextViewComponent
     {
         private readonly IEnumerable<Conflict> conflicts;
 

@@ -12,16 +12,16 @@ namespace FileSync.Client
     /// </summary>
     public sealed class SyncClient
     {
-        private readonly ConsoleView consoleView;
+        private readonly ITextView view;
         private readonly IFileStore fileStore;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
-            ConsoleView consoleView,
+            ITextView view,
             IFileStore fileStore,
             IFileServiceHttpClient fileService)
         {
-            this.consoleView = consoleView;
+            this.view = view;
             this.fileStore = fileStore;
             this.fileService = fileService;
         }
@@ -30,16 +30,16 @@ namespace FileSync.Client
         {
             // Check the files in our directory
             var filesOnClient = fileStore.GetFiles().Select(File.FromFileInfo).ToList();
-            consoleView.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
+            view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
             var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
-            consoleView.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
+            view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a message for conflicts
-            consoleView.Info(new ConflictsViewComponent(compareFiles.Conflicts()));
+            view.Info(new ConflictsViewComponent(compareFiles.Conflicts()));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
@@ -58,7 +58,7 @@ namespace FileSync.Client
             }
 
             // Print summary
-            consoleView.Info(new SummaryViewComponent(
+            view.Info(new SummaryViewComponent(
                 newFiles: filesToDownload, // TODO
                 changedFiles: filesToDownload, // TODO
                 sentFiles: filesToUpload));

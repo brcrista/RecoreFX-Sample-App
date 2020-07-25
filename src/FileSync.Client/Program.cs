@@ -23,7 +23,7 @@ namespace FileSync.Client
                 };
 
                 var syncClient = new SyncClient(
-                    consoleView: new ConsoleView { IsVerbose = true },
+                    view: new ConsoleView { IsVerbose = true },
                     fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
                     fileService: new FileServiceHttpClient(httpClient));
 
