@@ -23,6 +23,7 @@ namespace FileSync.Client.UI
 
         public IEnumerable<string> GetLines()
         {
+            yield return "";
             yield return "===== Summary =====";
             yield return "";
             foreach (var view in fileListViews)
