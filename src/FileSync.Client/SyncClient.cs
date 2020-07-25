@@ -39,7 +39,7 @@ namespace FileSync.Client
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a message for conflicts
-            view.Info(new ConflictsViewComponent(compareFiles.Conflicts()));
+            view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
@@ -58,7 +58,7 @@ namespace FileSync.Client
             }
 
             // Print summary
-            view.Info(new SummaryViewComponent(
+            view.Out(new SummaryViewComponent(
                 newFiles: filesToDownload, // TODO
                 changedFiles: filesToDownload, // TODO
                 sentFiles: filesToUpload));
