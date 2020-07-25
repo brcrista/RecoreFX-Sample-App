@@ -22,13 +22,13 @@ namespace FileSync.Client
                 var fileService = new FileServiceHttpClient();
                 var filesOnService = await fileService.GetFileInfoAsync();
 
-                var syncLogic = new SyncLogic(filesOnClient, filesOnService);
+                var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
                 // Print a warning for conflicts
-                var conflicts = syncLogic.Conflicts();
+                var conflicts = compareFiles.Conflicts();
 
                 // Download file content from the service
-                var filesToDownload = syncLogic.FilesToDownload().ToList();
+                var filesToDownload = compareFiles.FilesToDownload().ToList();
                 foreach (var file in filesToDownload)
                 {
                     var content = await fileService.GetFileContentAsync(file);
@@ -36,7 +36,7 @@ namespace FileSync.Client
                 }
 
                 // Upload files to the service
-                var filesToUpload = syncLogic.FilesToUpload().ToList();
+                var filesToUpload = compareFiles.FilesToUpload().ToList();
                 foreach (var file in filesToUpload)
                 {
                     var content = await fileStore.ReadFileAsync(file.Path);

@@ -5,12 +5,12 @@ using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    public sealed class SyncLogic
+    public sealed class CompareFiles
     {
         private IReadOnlyList<File> clientFiles;
         private IReadOnlyList<File> serverFiles;
 
-        public SyncLogic(IEnumerable<File> clientFiles, IEnumerable<File> serverFiles)
+        public CompareFiles(IEnumerable<File> clientFiles, IEnumerable<File> serverFiles)
         {
             this.clientFiles = clientFiles.ToList();
             this.serverFiles = serverFiles.ToList();
