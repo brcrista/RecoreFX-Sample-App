@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 using FileSync.Common;
-using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
@@ -14,43 +12,14 @@ namespace FileSync.Client
         {
             try
             {
-                // Check the files in our directory
-                var fileStore = new FileStore(new Filepath(Directory.GetCurrentDirectory()));
-                var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo);
+                var syncClient = new SyncClient(
+                     fileStore: new FileStore(new Filepath(Directory.GetCurrentDirectory())),
+                     fileService: new FileServiceHttpClient());
 
-                // Call the service to get the files on it
-                var fileService = new FileServiceHttpClient();
-                var filesOnService = await fileService.GetFileInfoAsync();
-
-                var compareFiles = new CompareFiles(filesOnClient, filesOnService);
-
-                // Print a warning for conflicts
-                var conflicts = compareFiles.Conflicts();
-
-                // Download file content from the service
-                var filesToDownload = compareFiles.FilesToDownload().ToList();
-                foreach (var file in filesToDownload)
+                await foreach (var resultLine in syncClient.RunAsync())
                 {
-                    var content = await fileService.GetFileContentAsync(file);
-                    await fileStore.WriteFileAsync(file.Path, content);
+                    Console.WriteLine(resultLine);
                 }
-
-                // Upload files to the service
-                var filesToUpload = compareFiles.FilesToUpload().ToList();
-                foreach (var file in filesToUpload)
-                {
-                    var content = await fileStore.ReadFileAsync(file.Path);
-                    await fileService.PutFileContentAsync(content);
-                }
-
-                // Print summary
-                Console.WriteLine("===== Summary =====");
-                // List new files
-                Console.WriteLine($"New files: {filesToDownload.Count}"); // TODO
-                // List uploaded files
-                Console.WriteLine($"Uploaded files: {filesToUpload.Count}");
-                // List modified files
-                Console.WriteLine($"Modified files: {filesToDownload.Count}"); // TODO
 
                 return 0;
             }

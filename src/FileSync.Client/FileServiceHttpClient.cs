@@ -6,7 +6,7 @@ using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    public sealed class FileServiceHttpClient
+    public sealed class FileServiceHttpClient : IFileServiceHttpClient
     {
         public Task<IEnumerable<ApiModels.File>> GetFileInfoAsync()
         {
