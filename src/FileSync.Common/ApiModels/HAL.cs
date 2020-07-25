@@ -13,11 +13,6 @@ namespace FileSync.Common.ApiModels
     {
         public sealed class Link
         {
-            public Link(Uri href)
-            {
-                Href = href;
-            }
-
             public Uri Href { get; set; }
 
             public bool? Templated { get; set; }
@@ -29,18 +24,33 @@ namespace FileSync.Common.ApiModels
             public string Name { get; set; }
         }
 
-        public HAL(Uri self)
+        /// <summary>
+        /// Create an instance of <see cref="HAL"/>.
+        /// </summary>
+        /// <remarks>
+        /// A parameterless constructor is needed for JSON deserialization,
+        /// but it's ok if it's private.
+        /// </remarks>
+        private HAL()
         {
-            Add("self", new Link(self));
         }
 
-        public HAL(Uri self, IReadOnlyDictionary<string, Uri> links)
-            : this(self)
+        public static HAL Create(Uri self, IReadOnlyDictionary<string, Uri> links = null)
         {
-            foreach (var link in links)
+            var result = new HAL
             {
-                Add(link.Key, new Link(link.Value));
+                { "self", new Link { Href = self } }
+            };
+
+            if (links != null)
+            {
+                foreach (var link in links)
+                {
+                    result.Add(link.Key, new Link { Href = link.Value });
+                }
             }
+
+            return result;
         }
     }
 }

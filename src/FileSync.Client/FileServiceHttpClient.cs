@@ -1,24 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    public sealed class FileServiceHttpClient
+    public sealed class FileServiceHttpClient : IFileServiceHttpClient
     {
-        public Task<IEnumerable<ApiModels.File>> GetFileInfoAsync()
+        private readonly HttpClient httpClient;
+        private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
         {
-            // TODO
-            return Task.FromResult(System.Linq.Enumerable.Empty<ApiModels.File>());
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        public FileServiceHttpClient(HttpClient httpClient)
+        {
+            this.httpClient = httpClient;
         }
 
-        public Task<Stream> GetFileContentAsync(ApiModels.File file)
+        public async Task<IEnumerable<ApiModels.File>> GetAllFileInfoAsync()
         {
-            // TODO
-            var uri = file.Links["self"].Href;
-            return Task.FromResult<Stream>(new MemoryStream());
+            var body = await httpClient.GetStreamAsync("api/v1/files");
+            return await JsonSerializer.DeserializeAsync<IEnumerable<ApiModels.File>>(body, jsonOptions);
+        }
+
+        public async Task<Stream> GetFileContentAsync(ApiModels.File file)
+        {
+            return await httpClient.GetStreamAsync(file.Links["content"].Href);
         }
 
         public Task<ApiModels.File> PutFileContentAsync(Stream content)

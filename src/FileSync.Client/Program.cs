@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Recore;
 
 using FileSync.Common;
-using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
@@ -14,43 +15,27 @@ namespace FileSync.Client
         {
             try
             {
-                // Check the files in our directory
-                var fileStore = new FileStore(new Filepath(Directory.GetCurrentDirectory()));
-                var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo);
-
-                // Call the service to get the files on it
-                var fileService = new FileServiceHttpClient();
-                var filesOnService = await fileService.GetFileInfoAsync();
-
-                var syncLogic = new SyncLogic(filesOnClient, filesOnService);
-
-                // Print a warning for conflicts
-                var conflicts = syncLogic.Conflicts();
-
-                // Download file content from the service
-                var filesToDownload = syncLogic.FilesToDownload().ToList();
-                foreach (var file in filesToDownload)
+                // Use a single HTTP client for connection pooling
+                // (not that it really matters in this application)
+                var httpClient = new HttpClient
                 {
-                    var content = await fileService.GetFileContentAsync(file);
-                    await fileStore.WriteFileAsync(file.Path, content);
-                }
+                    BaseAddress = new AbsoluteUri("http://localhost:5000/")
+                };
 
-                // Upload files to the service
-                var filesToUpload = syncLogic.FilesToUpload().ToList();
-                foreach (var file in filesToUpload)
+                var syncClient = new SyncClient(
+                     fileStore: new FileSystemFileStore(new Filepath(Directory.GetCurrentDirectory())),
+                     fileService: new FileServiceHttpClient(httpClient));
+
+                await foreach (var logMessage in syncClient.RunAsync())
                 {
-                    var content = await fileStore.ReadFileAsync(file.Path);
-                    await fileService.PutFileContentAsync(content);
-                }
+                    var textWriter = logMessage.Level switch
+                    {
+                        LogLevel.Error => Console.Error,
+                        _ => Console.Out
+                    };
 
-                // Print summary
-                Console.WriteLine("===== Summary =====");
-                // List new files
-                Console.WriteLine($"New files: {filesToDownload.Count}"); // TODO
-                // List uploaded files
-                Console.WriteLine($"Uploaded files: {filesToUpload.Count}");
-                // List modified files
-                Console.WriteLine($"Modified files: {filesToDownload.Count}"); // TODO
+                    textWriter.WriteLine(logMessage.Message);
+                }
 
                 return 0;
             }

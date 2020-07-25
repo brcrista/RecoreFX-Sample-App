@@ -6,6 +6,8 @@ namespace FileSync.Client
     {
         public File ClientFile { get; set; }
         public File ServerFile { get; set; }
-        public File ChosenFile { get; set; }
+        public ChosenVersion ChosenVersion { get; set; }
     }
+
+    public enum ChosenVersion { Client, Service }
 }
