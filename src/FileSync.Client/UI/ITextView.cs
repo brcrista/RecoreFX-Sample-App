@@ -7,8 +7,10 @@
     {
         bool IsVerbose { get; set; }
 
-        void Error(ITextViewComponent component);
-        void Info(ITextViewComponent component);
         void Verbose(ITextViewComponent component);
+
+        void Out(ITextViewComponent component);
+
+        void Error(ITextViewComponent component);
     }
 }

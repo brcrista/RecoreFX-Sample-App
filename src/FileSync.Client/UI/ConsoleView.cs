@@ -16,7 +16,7 @@ namespace FileSync.Client.UI
             }
         }
 
-        public void Info(ITextViewComponent component)
+        public void Out(ITextViewComponent component)
             => component.GetLines().ForEach(Console.WriteLine);
 
         public void Error(ITextViewComponent component)
