@@ -24,10 +24,21 @@ namespace FileSync.Client
         public async IAsyncEnumerable<LogMessage> RunAsync()
         {
             // Check the files in our directory
-            var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo);
+            var filesOnClient = fileStore.GetFiles().Select(ApiModels.File.FromFileInfo).ToList();
+            yield return Verbose("Files on the client:");
+            foreach (var message in LogFiles(Verbose, filesOnClient))
+            {
+                yield return message;
+            }
 
             // Call the service to get the files on it
             var filesOnService = await fileService.GetAllFileInfoAsync();
+            yield return Verbose("Files on the service:");
+            foreach (var message in LogFiles(Verbose, filesOnClient))
+            {
+                yield return message;
+            }
+
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
 
             // Print a message for conflicts
@@ -37,11 +48,11 @@ namespace FileSync.Client
                     => conflict.ChosenVersion switch
                     {
                         ChosenVersion.Client => "client",
-                        ChosenVersion.Server => "server",
+                        ChosenVersion.Service => "service",
                         _ => throw new InvalidOperationException(conflict.ToString())
                     };
 
-                yield return Info($"'{conflict.ClientFile.Path}' exists on both the client and the server."
+                yield return Info($"'{conflict.ClientFile.Path}' exists on both the client and the service."
                     + $" Choosing the {WhoseFile(conflict)}'s version.");
             }
 
@@ -63,24 +74,51 @@ namespace FileSync.Client
 
             // Print summary
             yield return Info("===== Summary =====");
+
             // List new files
             yield return Info($"New files: {filesToDownload.Count}"); // TODO
+            foreach (var message in LogFiles(Info, filesToDownload))
+            {
+                yield return message;
+            }
+
             // List uploaded files
             yield return Info($"Uploaded files: {filesToUpload.Count}");
+            foreach (var message in LogFiles(Info, filesToUpload))
+            {
+                yield return message;
+            }
+
             // List modified files
             yield return Info($"Modified files: {filesToDownload.Count}"); // TODO
+            foreach (var message in LogFiles(Info, filesToDownload))
+            {
+                yield return message;
+            }
         }
 
-        private static LogMessage Info(string message) => new LogMessage
-        {
-            Level = LogLevel.Information,
-            Message = message
-        };
+        #region log helpers
+        private static LogMessage CreateLogMessage(LogLevel level, string message)
+            => new LogMessage { Level = level, Message = message };
 
-        private static LogMessage Error(string message) => new LogMessage
+        private static LogMessage Verbose(string message)
+            => CreateLogMessage(LogLevel.Debug, message);
+
+        private static LogMessage Info(string message)
+            => CreateLogMessage(LogLevel.Information, message);
+
+        private static IEnumerable<LogMessage> LogFiles(Func<string, LogMessage> logLevel, IEnumerable<ApiModels.File> files)
         {
-            Level = LogLevel.Error,
-            Message = message
-        };
+            foreach (var file in files)
+            {
+                yield return logLevel(Indent(file.Path.Value));
+            }
+
+            // Log a blank line
+            yield return logLevel(string.Empty);
+        }
+
+        private static string Indent(string source) => "  " + source;
+        #endregion
     }
 }

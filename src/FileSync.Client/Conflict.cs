@@ -9,5 +9,5 @@ namespace FileSync.Client
         public ChosenVersion ChosenVersion { get; set; }
     }
 
-    public enum ChosenVersion { Client, Server }
+    public enum ChosenVersion { Client, Service }
 }
