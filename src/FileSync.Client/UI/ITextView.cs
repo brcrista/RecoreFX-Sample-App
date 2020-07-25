@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a text-based medium for showing information to a user.
     /// </summary>
-    public interface ITextView
+    interface ITextView
     {
         bool IsVerbose { get; set; }
 

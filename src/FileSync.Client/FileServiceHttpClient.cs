@@ -8,7 +8,7 @@ using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    public sealed class FileServiceHttpClient : IFileServiceHttpClient
+    sealed class FileServiceHttpClient : IFileServiceHttpClient
     {
         private readonly HttpClient httpClient;
         private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions

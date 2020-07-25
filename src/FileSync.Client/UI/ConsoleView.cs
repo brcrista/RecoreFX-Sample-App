@@ -4,7 +4,7 @@ using Recore.Linq;
 
 namespace FileSync.Client.UI
 {
-    public sealed class ConsoleView : ITextView
+    sealed class ConsoleView : ITextView
     {
         public bool IsVerbose { get; set; }
 
