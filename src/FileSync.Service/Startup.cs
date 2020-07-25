@@ -10,7 +10,7 @@ using FileSync.Common;
 
 namespace FileSync.Service
 {
-    public sealed class Startup
+    sealed class Startup
     {
         public void ConfigureServices(IServiceCollection services)
         {

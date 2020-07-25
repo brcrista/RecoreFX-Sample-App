@@ -3,9 +3,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace FileSync.Service
 {
-    public static class Program
+    static class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             Host
                 .CreateDefaultBuilder(args)

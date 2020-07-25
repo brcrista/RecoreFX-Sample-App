@@ -5,7 +5,7 @@ using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    public sealed class CompareFiles
+    sealed class CompareFiles
     {
         private readonly IReadOnlyList<File> clientFiles;
         private readonly IReadOnlyList<File> serverFiles;

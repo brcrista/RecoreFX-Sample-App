@@ -5,7 +5,7 @@ namespace FileSync.Client.UI
     /// <summary>
     /// Represents some information to be displayed on an <seealso cref="ITextView"/>.
     /// </summary>
-    public interface ITextViewComponent
+    interface ITextViewComponent
     {
         IEnumerable<string> GetLines();
     }

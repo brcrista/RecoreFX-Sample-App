@@ -10,7 +10,7 @@ namespace FileSync.Client
     /// <summary>
     /// Implements the high-level logic for the file sync client.
     /// </summary>
-    public sealed class SyncClient
+    sealed class SyncClient
     {
         private readonly ITextView view;
         private readonly IFileStore fileStore;
