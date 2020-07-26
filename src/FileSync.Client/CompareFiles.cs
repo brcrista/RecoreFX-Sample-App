@@ -18,14 +18,16 @@ namespace FileSync.Client
         }
 
         public IEnumerable<File> FilesToDownload()
-            => serviceFiles.Keys
-                .Except(clientFiles.Keys)
-                .Select(key => serviceFiles[key]);
+            => OnlyOnService().Concat(
+                Conflicts()
+                    .Where(conflict => conflict.ChosenVersion == ChosenVersion.Service)
+                    .Select(conflict => conflict.ServiceFile));
 
         public IEnumerable<File> FilesToUpload()
-            => clientFiles.Keys
-                .Except(serviceFiles.Keys)
-                .Select(key => clientFiles[key]);
+            => OnlyOnClient().Concat(
+                Conflicts()
+                    .Where(conflict => conflict.ChosenVersion == ChosenVersion.Client)
+                    .Select(conflict => conflict.ClientFile));
 
         public IEnumerable<Conflict> Conflicts()
             => clientFiles.Keys
@@ -33,5 +35,15 @@ namespace FileSync.Client
                 .Select(key => new Conflict(
                     clientFile: clientFiles[key],
                     serviceFile: serviceFiles[key]));
+
+        private IEnumerable<File> OnlyOnService()
+            => serviceFiles.Keys
+                .Except(clientFiles.Keys)
+                .Select(key => serviceFiles[key]);
+
+        private IEnumerable<File> OnlyOnClient()
+            => clientFiles.Keys
+                .Except(serviceFiles.Keys)
+                .Select(key => clientFiles[key]);
     }
 }
