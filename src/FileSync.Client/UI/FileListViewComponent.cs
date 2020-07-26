@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using FileSync.Common.ApiModels;
 
@@ -7,12 +8,12 @@ namespace FileSync.Client.UI
     sealed class FileListViewComponent : ITextViewComponent
     {
         private readonly string label;
-        private readonly IEnumerable<File> files;
+        private readonly IReadOnlyList<File> files;
 
         public FileListViewComponent(string label, IEnumerable<File> files)
         {
             this.label = label;
-            this.files = files;
+            this.files = files.ToArray();
         }
 
         public IEnumerable<string> GetLines()
@@ -23,7 +24,6 @@ namespace FileSync.Client.UI
                 yield return Indent(file.Path.Value);
             }
 
-            // Log a blank line
             yield return string.Empty;
         }
 
