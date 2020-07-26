@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Recore.Collections.Generic;
 
 using FileSync.Client.UI;
 using FileSync.Common;
@@ -43,6 +44,8 @@ namespace FileSync.Client
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
+            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
+
             foreach (var file in filesToDownload)
             {
                 var content = await fileService.GetFileContentAsync(file);
@@ -51,6 +54,8 @@ namespace FileSync.Client
 
             // Upload files to the service
             var filesToUpload = compareFiles.FilesToUpload().ToList();
+            view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
+
             foreach (var file in filesToUpload)
             {
                 var content = await fileStore.ReadFileAsync(file.Path);
@@ -58,9 +63,11 @@ namespace FileSync.Client
             }
 
             // Print summary
+            var compareOnFilepath = new MappedEqualityComparer<File, Filepath>(x => x.Path);
+
             view.Out(new SummaryViewComponent(
-                newFiles: filesToDownload, // TODO
-                changedFiles: filesToDownload, // TODO
+                newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
+                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList(),
                 sentFiles: filesToUpload));
         }
     }

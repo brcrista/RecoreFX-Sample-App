@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+rm -rf client service
+
 mkdir client
 echo "client-only file" > client/client-only.txt
 echo "shared file" > client/shared-file.txt

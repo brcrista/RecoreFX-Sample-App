@@ -6,7 +6,7 @@ namespace FileSync.Client.UI
 {
     sealed class SummaryViewComponent : ITextViewComponent
     {
-        private readonly IEnumerable<FileListViewComponent> fileListViews;
+        private readonly IReadOnlyList<FileListViewComponent> fileListViews;
 
         public SummaryViewComponent(
             IReadOnlyList<File> newFiles,
@@ -23,9 +23,9 @@ namespace FileSync.Client.UI
 
         public IEnumerable<string> GetLines()
         {
-            yield return "";
+            yield return string.Empty;
             yield return "===== Summary =====";
-            yield return "";
+            yield return string.Empty;
             foreach (var view in fileListViews)
             {
                 foreach (var line in view.GetLines())

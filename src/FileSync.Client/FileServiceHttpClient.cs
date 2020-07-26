@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -30,6 +31,11 @@ namespace FileSync.Client
 
         public async Task<Stream> GetFileContentAsync(ApiModels.File file)
         {
+            if (file.Links?["content"]?.Href == null)
+            {
+                throw new ArgumentException(nameof(file));
+            }
+
             return await httpClient.GetStreamAsync(file.Links["content"].Href);
         }
 

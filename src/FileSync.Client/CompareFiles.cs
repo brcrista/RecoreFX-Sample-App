@@ -1,38 +1,49 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
     sealed class CompareFiles
     {
-        private readonly IReadOnlyList<File> clientFiles;
-        private readonly IReadOnlyList<File> serverFiles;
+        private readonly Dictionary<Filepath, File> clientFiles;
+        private readonly Dictionary<Filepath, File> serviceFiles;
 
-        public CompareFiles(IEnumerable<File> clientFiles, IEnumerable<File> serverFiles)
+        public CompareFiles(IEnumerable<File> clientFiles, IEnumerable<File> serviceFiles)
         {
-            this.clientFiles = clientFiles.ToList();
-            this.serverFiles = serverFiles.ToList();
+            this.clientFiles = clientFiles.ToDictionary(x => x.Path);
+            this.serviceFiles = serviceFiles.ToDictionary(x => x.Path);
         }
 
         public IEnumerable<File> FilesToDownload()
-        {
-            // TODO
-            return serverFiles;
-        }
+            => OnlyOnService().Concat(
+                Conflicts()
+                    .Where(conflict => conflict.ChosenVersion == ChosenVersion.Service)
+                    .Select(conflict => conflict.ServiceFile));
 
         public IEnumerable<File> FilesToUpload()
-        {
-            // TODO
-            return clientFiles;
-        }
+            => OnlyOnClient().Concat(
+                Conflicts()
+                    .Where(conflict => conflict.ChosenVersion == ChosenVersion.Client)
+                    .Select(conflict => conflict.ClientFile));
 
         public IEnumerable<Conflict> Conflicts()
-        {
-            // TODO
-            // Choose newer timestamp
-            return Enumerable.Empty<Conflict>();
-        }
+            => clientFiles.Keys
+                .Intersect(serviceFiles.Keys)
+                .Select(key => new Conflict(
+                    clientFile: clientFiles[key],
+                    serviceFile: serviceFiles[key]));
+
+        private IEnumerable<File> OnlyOnService()
+            => serviceFiles.Keys
+                .Except(clientFiles.Keys)
+                .Select(key => serviceFiles[key]);
+
+        private IEnumerable<File> OnlyOnClient()
+            => clientFiles.Keys
+                .Except(serviceFiles.Keys)
+                .Select(key => clientFiles[key]);
     }
 }

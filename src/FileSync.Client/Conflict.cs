@@ -4,9 +4,18 @@ namespace FileSync.Client
 {
     sealed class Conflict
     {
-        public File ClientFile { get; set; }
-        public File ServerFile { get; set; }
-        public ChosenVersion ChosenVersion { get; set; }
+        public File ClientFile { get; }
+        public File ServiceFile { get; }
+        public ChosenVersion ChosenVersion { get; }
+
+        public Conflict(File clientFile, File serviceFile)
+        {
+            ClientFile = clientFile;
+            ServiceFile = serviceFile;
+            ChosenVersion = serviceFile.LastWriteTimeUtc > clientFile.LastWriteTimeUtc
+                ? ChosenVersion.Service
+                : ChosenVersion.Client;
+        }
     }
 
     enum ChosenVersion { Client, Service }

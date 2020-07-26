@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FileSync.Client.UI
 {
     sealed class ConflictsViewComponent : ITextViewComponent
     {
-        private readonly IEnumerable<Conflict> conflicts;
+        private readonly IReadOnlyList<Conflict> conflicts;
 
         public ConflictsViewComponent(IEnumerable<Conflict> conflicts)
         {
-            this.conflicts = conflicts;
+            this.conflicts = conflicts.ToArray();
         }
 
         public IEnumerable<string> GetLines()
@@ -18,6 +19,11 @@ namespace FileSync.Client.UI
             {
                 yield return $"'{conflict.ClientFile.Path}' exists on both the client and the service."
                     + $" Choosing the {WhoseFile(conflict)}'s version.";
+            }
+
+            if (conflicts.Any())
+            {
+                yield return string.Empty;
             }
         }
 
