@@ -43,6 +43,8 @@ namespace FileSync.Client
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
+            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
+
             foreach (var file in filesToDownload)
             {
                 var content = await fileService.GetFileContentAsync(file);
@@ -51,6 +53,8 @@ namespace FileSync.Client
 
             // Upload files to the service
             var filesToUpload = compareFiles.FilesToUpload().ToList();
+            view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
+
             foreach (var file in filesToUpload)
             {
                 var content = await fileStore.ReadFileAsync(file.Path);
