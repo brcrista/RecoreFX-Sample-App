@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using FileSync.Common;
 using ApiModels = FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -32,10 +33,13 @@ namespace FileSync.Client
             return await httpClient.GetStreamAsync(file.Links["content"].Href);
         }
 
-        public Task<ApiModels.File> PutFileContentAsync(Stream content)
+        public async Task PutFileContentAsync(Filepath path, Stream content)
         {
-            // TODO
-            throw new System.NotImplementedException();
+            var response = await httpClient.PutAsync($"api/v1/files/{path.Value}/content", new StreamContent(content));
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(response.ReasonPhrase);
+            }
         }
     }
 }

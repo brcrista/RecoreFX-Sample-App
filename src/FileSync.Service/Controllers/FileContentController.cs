@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,10 +24,15 @@ namespace FileSync.Service.Controllers
             return File(stream, MediaTypeNames.Application.Octet);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UploadFileAsync([FromRoute] string path, [FromBody] byte[] contents)
+        [HttpPut]
+        public async Task<IActionResult> UploadFileAsync([FromRoute] string path)
         {
-            await fileStore.WriteFileAsync(new Filepath(path), new MemoryStream(contents));
+            if (!Request.Body.CanRead)
+            {
+                return BadRequest();
+            }
+
+            await fileStore.WriteFileAsync(new Filepath(path), Request.Body);
             return CreatedAtAction(nameof(DownloadFileAsync), routeValues: new { path }, value: path);
         }
     }
