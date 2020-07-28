@@ -6,7 +6,7 @@ namespace FileSync.Common
 {
     public interface IFileStore
     {
-        public IEnumerable<ApiModels.File> GetFiles();
+        public IEnumerable<FileInfo> GetFiles();
 
         public Task<Stream> ReadFileAsync(Filepath path);
 

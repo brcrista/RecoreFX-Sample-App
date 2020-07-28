@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -24,16 +23,12 @@ namespace FileSync.Service.Controllers
         [HttpGet]
         public IEnumerable<ApiModels.File> GetFiles()
         {
-            foreach (var file in fileStore.GetFiles())
+            foreach (var fileInfo in fileStore.GetFiles())
             {
-                // Set the HAL URLs for the file
                 var requestUrl = HttpContext.Request.GetEncodedUrl();
-                var selfUrl = new AbsoluteUri(requestUrl).Combine(file.Path.Value);
-                file.Links = ApiModels.HAL.Create(
-                    selfUrl,
-                    new Dictionary<string, Uri> { ["content"] = selfUrl.Combine("content") });
-
-                yield return file;
+                yield return ApiModels.File.FromFileInfo(
+                    fileInfo,
+                    selfUri: new AbsoluteUri(requestUrl).Combine(fileInfo.Name));
             }
         }
     }

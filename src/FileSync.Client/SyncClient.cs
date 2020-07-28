@@ -30,7 +30,7 @@ namespace FileSync.Client
         public async Task RunAsync()
         {
             // Check the files in our directory
-            var filesOnClient = fileStore.GetFiles().ToList();
+            var filesOnClient = fileStore.GetFiles().Select(File.FromFileInfo).ToList();
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
