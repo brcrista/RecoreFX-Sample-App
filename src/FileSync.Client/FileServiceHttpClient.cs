@@ -41,7 +41,7 @@ namespace FileSync.Client
 
         public async Task PutFileContentAsync(Filepath path, Stream content)
         {
-            var response = await httpClient.PutAsync($"api/v1/files/{path.Value}/content", new StreamContent(content));
+            var response = await httpClient.PutAsync($"api/v1/files/{path}/content", new StreamContent(content));
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(response.ReasonPhrase);

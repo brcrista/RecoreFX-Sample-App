@@ -18,7 +18,7 @@ namespace FileSync.Common
 
         public IEnumerable<FileInfo> GetFiles()
         {
-            foreach (var file in Directory.EnumerateFiles(Filepath.Value))
+            foreach (var file in Directory.EnumerateFiles(Filepath))
             {
                 yield return new FileInfo(file);
             }
