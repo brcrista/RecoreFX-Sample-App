@@ -17,7 +17,7 @@ namespace FileSync.Client.UI
         {
             foreach (var conflict in conflicts)
             {
-                yield return $"'{conflict.ClientFile.Path}' exists on both the client and the service."
+                yield return $"'{conflict.ClientFile.RelativePath}' exists on both the client and the service."
                     + $" Choosing the {WhoseFile(conflict)}'s version.";
             }
 

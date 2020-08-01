@@ -7,7 +7,7 @@ using FileSync.Common;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("api/v1/files/{path}/content")]
+    [Route("api/v1/content/{path}")]
     public sealed class FileContentV1Controller : ControllerBase
     {
         private readonly IFileStore fileStore;

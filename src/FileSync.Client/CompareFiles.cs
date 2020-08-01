@@ -8,22 +8,22 @@ namespace FileSync.Client
 {
     sealed class CompareFiles
     {
-        private readonly Dictionary<Filepath, File> clientFiles;
-        private readonly Dictionary<Filepath, File> serviceFiles;
+        private readonly Dictionary<Filepath, FileSyncFile> clientFiles;
+        private readonly Dictionary<Filepath, FileSyncFile> serviceFiles;
 
-        public CompareFiles(IEnumerable<File> clientFiles, IEnumerable<File> serviceFiles)
+        public CompareFiles(IEnumerable<FileSyncFile> clientFiles, IEnumerable<FileSyncFile> serviceFiles)
         {
-            this.clientFiles = clientFiles.ToDictionary(x => x.Path);
-            this.serviceFiles = serviceFiles.ToDictionary(x => x.Path);
+            this.clientFiles = clientFiles.ToDictionary(x => x.RelativePath);
+            this.serviceFiles = serviceFiles.ToDictionary(x => x.RelativePath);
         }
 
-        public IEnumerable<File> FilesToDownload()
+        public IEnumerable<FileSyncFile> FilesToDownload()
             => OnlyOnService().Concat(
                 Conflicts()
                     .Where(conflict => conflict.ChosenVersion == ChosenVersion.Service)
                     .Select(conflict => conflict.ServiceFile));
 
-        public IEnumerable<File> FilesToUpload()
+        public IEnumerable<FileSyncFile> FilesToUpload()
             => OnlyOnClient().Concat(
                 Conflicts()
                     .Where(conflict => conflict.ChosenVersion == ChosenVersion.Client)
@@ -36,12 +36,12 @@ namespace FileSync.Client
                     clientFile: clientFiles[key],
                     serviceFile: serviceFiles[key]));
 
-        private IEnumerable<File> OnlyOnService()
+        private IEnumerable<FileSyncFile> OnlyOnService()
             => serviceFiles.Keys
                 .Except(clientFiles.Keys)
                 .Select(key => serviceFiles[key]);
 
-        private IEnumerable<File> OnlyOnClient()
+        private IEnumerable<FileSyncFile> OnlyOnClient()
             => clientFiles.Keys
                 .Except(serviceFiles.Keys)
                 .Select(key => clientFiles[key]);

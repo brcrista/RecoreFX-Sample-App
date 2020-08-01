@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Recore.Collections.Generic;
 
 using FileSync.Client.UI;
 using FileSync.Common;
 using FileSync.Common.ApiModels;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace FileSync.Client
 {
@@ -14,27 +17,29 @@ namespace FileSync.Client
     sealed class SyncClient
     {
         private readonly ITextView view;
-        private readonly IFileStore fileStore;
+        private readonly FileStoreFactory fileStoreFactory;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
             ITextView view,
-            IFileStore fileStore,
+            FileStoreFactory fileStoreFactory,
             IFileServiceHttpClient fileService)
         {
             this.view = view;
-            this.fileStore = fileStore;
+            this.fileStoreFactory = fileStoreFactory;
             this.fileService = fileService;
         }
 
         public async Task RunAsync()
         {
-            // Check the files in our directory
-            var filesOnClient = fileStore.GetFiles().Select(File.FromFileInfo).ToList();
+            var fileStore = fileStoreFactory.Create(new Filepath("."));
+
+            // Get the files on the client
+            var filesOnClient = GetAllFilesOnClient(fileStore).ToList();
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
-            var filesOnService = (await fileService.GetAllFileInfoAsync()).ToList();
+            var filesOnService = (await GetAllFilesOnService()).ToList();
             view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
             var compareFiles = new CompareFiles(filesOnClient, filesOnService);
@@ -49,7 +54,7 @@ namespace FileSync.Client
             foreach (var file in filesToDownload)
             {
                 var content = await fileService.GetFileContentAsync(file);
-                await fileStore.WriteFileAsync(file.Path, content);
+                await fileStore.WriteFileAsync(file.RelativePath, content);
             }
 
             // Upload files to the service
@@ -58,17 +63,38 @@ namespace FileSync.Client
 
             foreach (var file in filesToUpload)
             {
-                var content = await fileStore.ReadFileAsync(file.Path);
-                await fileService.PutFileContentAsync(file.Path, content);
+                var content = await fileStore.ReadFileAsync(file.RelativePath);
+                await fileService.PutFileContentAsync(file.RelativePath, content);
             }
 
             // Print summary
-            var compareOnFilepath = new MappedEqualityComparer<File, Filepath>(x => x.Path);
+            var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, Filepath>(x => x.RelativePath);
 
             view.Out(new SummaryViewComponent(
                 newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
                 changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList(),
                 sentFiles: filesToUpload));
+        }
+
+        private IEnumerable<FileSyncFile> GetAllFilesOnClient(IFileStore fileStore)
+        {
+            // TODO this doesn't prepend the path
+            //foreach (var file in fileStore.GetFiles())
+            //{
+            //    yield return file;
+            //}
+            return Directory.EnumerateFiles(".", searchPattern: "*", enumerationOptions: new EnumerationOptions
+            {
+                RecurseSubdirectories = true
+            })
+            .Select(file => new FileInfo(file))
+            .Select(file => FileSyncFile.FromFileInfo(file, new Filepath(".")));
+        }
+
+        private async Task<IEnumerable<FileSyncFile>> GetAllFilesOnService()
+        {
+            // TODO recurse
+            return await fileService.GetDirectoryListingAsync(new Filepath("."));
         }
     }
 }

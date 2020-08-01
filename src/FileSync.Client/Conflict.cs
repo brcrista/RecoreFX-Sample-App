@@ -4,11 +4,11 @@ namespace FileSync.Client
 {
     sealed class Conflict
     {
-        public File ClientFile { get; }
-        public File ServiceFile { get; }
+        public FileSyncFile ClientFile { get; }
+        public FileSyncFile ServiceFile { get; }
         public ChosenVersion ChosenVersion { get; }
 
-        public Conflict(File clientFile, File serviceFile)
+        public Conflict(FileSyncFile clientFile, FileSyncFile serviceFile)
         {
             ClientFile = clientFile;
             ServiceFile = serviceFile;

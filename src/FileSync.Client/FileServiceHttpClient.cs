@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using FileSync.Common;
-using ApiModels = FileSync.Common.ApiModels;
+using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
@@ -23,20 +23,17 @@ namespace FileSync.Client
             this.httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<ApiModels.File>> GetAllFileInfoAsync()
+        public async Task<IEnumerable<FileSyncFile>> GetDirectoryListingAsync(Filepath path)
         {
-            var body = await httpClient.GetStreamAsync("api/v1/files");
-            return await JsonSerializer.DeserializeAsync<IEnumerable<ApiModels.File>>(body, jsonOptions);
+            var body = await httpClient.GetStreamAsync($"api/v1/listing/{path}");
+            return await JsonSerializer.DeserializeAsync<IEnumerable<FileSyncFile>>(body, jsonOptions);
         }
 
-        public async Task<Stream> GetFileContentAsync(ApiModels.File file)
+        public async Task<Stream> GetFileContentAsync(FileSyncFile file)
         {
-            if (file.Links?["content"]?.Href == null)
-            {
-                throw new ArgumentException(nameof(file));
-            }
-
-            return await httpClient.GetStreamAsync(file.Links["content"].Href);
+            return await file.Content.Switch(
+                async x => await httpClient.GetStreamAsync(x),
+                () => throw new ArgumentNullException(nameof(file.Content)));
         }
 
         public async Task PutFileContentAsync(Filepath path, Stream content)
