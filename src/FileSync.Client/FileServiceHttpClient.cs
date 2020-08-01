@@ -31,9 +31,9 @@ namespace FileSync.Client
 
         public async Task<Stream> GetFileContentAsync(FileSyncFile file)
         {
-            return await file.Content.Switch(
+            return await file.ContentUrl.Switch(
                 async x => await httpClient.GetStreamAsync(x),
-                () => throw new ArgumentNullException(nameof(file.Content)));
+                () => throw new ArgumentNullException(nameof(file.ContentUrl)));
         }
 
         public async Task PutFileContentAsync(Filepath path, Stream content)

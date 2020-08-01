@@ -10,7 +10,7 @@ namespace FileSync.Common.ApiModels
 
         public DateTime LastWriteTimeUtc { get; set; }
 
-        public Optional<AbsoluteUri> Content { get; set; }
+        public Optional<string> ContentUrl { get; set; }
 
         public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath)
             => FromFileInfo(fileInfo, relativePath, contentUri: Optional<AbsoluteUri>.Empty);
@@ -20,7 +20,7 @@ namespace FileSync.Common.ApiModels
             {
                 RelativePath = relativePath.Combine(new Filepath(fileInfo.Name)),
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                Content = contentUri
+                ContentUrl = contentUri.OnValue(x => x.AbsoluteUri)
             };
     }
 }

@@ -10,7 +10,7 @@ using FileSync.Common.ApiModels;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("api/v1/listing/{path}")]
+    [Route("api/v1/listing")]
     public sealed class DirectoryV1Controller : ControllerBase
     {
         private readonly FileStoreFactory fileStoreFactory;
@@ -21,6 +21,11 @@ namespace FileSync.Service.Controllers
         }
 
         [HttpGet]
+        public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing()
+            => GetListing(".");
+
+        [HttpGet]
+        [Route("{path}")]
         public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing([FromRoute] string path)
         {
             var fileStore = fileStoreFactory.Create(new Filepath(path));
