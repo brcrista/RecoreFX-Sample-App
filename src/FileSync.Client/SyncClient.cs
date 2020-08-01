@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Recore.Collections.Generic;
@@ -7,7 +6,6 @@ using Recore.Collections.Generic;
 using FileSync.Client.UI;
 using FileSync.Common;
 using FileSync.Common.ApiModels;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace FileSync.Client
 {
@@ -35,7 +33,7 @@ namespace FileSync.Client
             var fileStore = fileStoreFactory.Create(new Filepath("."));
 
             // Get the files on the client
-            var filesOnClient = GetAllFilesOnClient(fileStore).ToList();
+            var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new Filepath(".")).ToList();
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
@@ -76,19 +74,24 @@ namespace FileSync.Client
                 sentFiles: filesToUpload));
         }
 
-        private IEnumerable<FileSyncFile> GetAllFilesOnClient(IFileStore fileStore)
+        private IEnumerable<FileSyncFile> GetAllFilesOnClient(FileStoreFactory fileStoreFactory, Filepath currentDirectory)
         {
-            // TODO this doesn't prepend the path
-            //foreach (var file in fileStore.GetFiles())
-            //{
-            //    yield return file;
-            //}
-            return Directory.EnumerateFiles(".", searchPattern: "*", enumerationOptions: new EnumerationOptions
+            var fileStore = fileStoreFactory.Create(currentDirectory);
+            foreach (var file in fileStore.GetFiles())
             {
-                RecurseSubdirectories = true
-            })
-            .Select(file => new FileInfo(file))
-            .Select(file => FileSyncFile.FromFileInfo(file, new Filepath(".")));
+                yield return FileSyncFile.FromFileInfo(file, currentDirectory);
+            }
+
+            var directories = fileStore.GetDirectories();
+            foreach (var directory in directories)
+            {
+                var subdirectory = currentDirectory.Combine(new Filepath(directory.Name));
+                var filesInSubdir = GetAllFilesOnClient(fileStoreFactory, subdirectory);
+                foreach (var file in filesInSubdir)
+                {
+                    yield return file;
+                }
+            }
         }
 
         private async Task<IEnumerable<FileSyncFile>> GetAllFilesOnService()
