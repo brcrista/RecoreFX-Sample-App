@@ -8,11 +8,11 @@ namespace FileSync.Common.ApiModels
         public Filepath RelativePath { get; set; }
         public string ListingUrl { get; set; }
 
-        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath relativePath, AbsoluteUri listingUri)
+        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath relativePath, RelativeUri listingUri)
             => new FileSyncDirectory
             {
                 RelativePath = relativePath.Combine(new Filepath(directoryInfo.Name)),
-                ListingUrl = listingUri.AbsoluteUri
+                ListingUrl = listingUri.ToString()
             };
     }
 }

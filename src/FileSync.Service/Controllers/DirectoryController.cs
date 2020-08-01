@@ -31,20 +31,18 @@ namespace FileSync.Service.Controllers
             var fileStore = fileStoreFactory.Create(new Filepath(path));
             foreach (var directoryInfo in fileStore.GetDirectories())
             {
-                var requestUrl = HttpContext.Request.GetEncodedUrl();
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
                     relativePath: new Filepath(path),
-                    listingUri: new AbsoluteUri(requestUrl).Combine(directoryInfo.Name));
+                    listingUri: new RelativeUri("api/v1/listing").Combine(directoryInfo.Name));
             }
 
             foreach (var fileInfo in fileStore.GetFiles())
             {
-                var requestUrl = HttpContext.Request.GetEncodedUrl();
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     relativePath: new Filepath(path),
-                    contentUri: new AbsoluteUri(requestUrl).Combine(fileInfo.Name));
+                    contentUri: new RelativeUri("api/v1/listing").Combine(fileInfo.Name));
             }
         }
     }

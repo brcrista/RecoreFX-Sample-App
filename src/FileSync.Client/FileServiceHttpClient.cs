@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Recore;
 
 using FileSync.Common;
 using FileSync.Common.ApiModels;
@@ -23,10 +24,13 @@ namespace FileSync.Client
             this.httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<FileSyncFile>> GetDirectoryListingAsync(Filepath path)
+        public async Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync()
+            => await GetDirectoryListingAsync(new RelativeUri("api/v1/listing"));
+
+        public async Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync(RelativeUri listingUri)
         {
-            var body = await httpClient.GetStreamAsync($"api/v1/listing/{path}");
-            return await JsonSerializer.DeserializeAsync<IEnumerable<FileSyncFile>>(body, jsonOptions);
+            var body = await httpClient.GetStreamAsync(listingUri);
+            return await JsonSerializer.DeserializeAsync<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>>(body, jsonOptions);
         }
 
         public async Task<Stream> GetFileContentAsync(FileSyncFile file)
@@ -38,7 +42,7 @@ namespace FileSync.Client
 
         public async Task PutFileContentAsync(Filepath path, Stream content)
         {
-            var response = await httpClient.PutAsync($"api/v1/files/{path}/content", new StreamContent(content));
+            var response = await httpClient.PutAsync($"api/v1/content/{path}", new StreamContent(content));
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(response.ReasonPhrase);

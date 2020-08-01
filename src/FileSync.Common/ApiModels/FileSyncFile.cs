@@ -13,14 +13,14 @@ namespace FileSync.Common.ApiModels
         public Optional<string> ContentUrl { get; set; }
 
         public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath)
-            => FromFileInfo(fileInfo, relativePath, contentUri: Optional<AbsoluteUri>.Empty);
+            => FromFileInfo(fileInfo, relativePath, contentUri: Optional<RelativeUri>.Empty);
 
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, Optional<AbsoluteUri> contentUri)
+        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, Optional<RelativeUri> contentUri)
             => new FileSyncFile
             {
                 RelativePath = relativePath.Combine(new Filepath(fileInfo.Name)),
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                ContentUrl = contentUri.OnValue(x => x.AbsoluteUri)
+                ContentUrl = contentUri.OnValue(x => x.ToString())
             };
     }
 }

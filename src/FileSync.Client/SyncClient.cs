@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Recore;
 using Recore.Collections.Generic;
 
 using FileSync.Client.UI;
@@ -96,8 +97,29 @@ namespace FileSync.Client
 
         private async Task<IEnumerable<FileSyncFile>> GetAllFilesOnService()
         {
-            // TODO recurse
-            return await fileService.GetDirectoryListingAsync(new Filepath("."));
+            async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(Optional<RelativeUri> listingUri)
+            {
+                var listing = await listingUri.Switch(
+                    async x => await fileService.GetDirectoryListingAsync(x),
+                    async () => await fileService.GetDirectoryListingAsync());
+
+                var result = new LinkedList<FileSyncFile>();
+                foreach (var entry in listing)
+                {
+                    var files = await entry.Switch(
+                        async dir => await GetServiceFilesRecursive(new RelativeUri(dir.ListingUrl)),
+                        file => Task.FromResult<IEnumerable<FileSyncFile>>(new[] { file }));
+
+                    foreach (var file in files)
+                    {
+                        result.AddLast(file);
+                    }
+                }
+
+                return result;
+            }
+
+            return await GetServiceFilesRecursive(Optional<RelativeUri>.Empty);
         }
     }
 }
