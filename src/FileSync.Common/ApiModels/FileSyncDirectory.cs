@@ -11,7 +11,7 @@ namespace FileSync.Common.ApiModels
         public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath relativePath, AbsoluteUri listingUri)
             => new FileSyncDirectory
             {
-                RelativePath = new Filepath(Path.Combine(relativePath, directoryInfo.Name)),
+                RelativePath = relativePath.Combine(new Filepath(directoryInfo.Name)),
                 Listing = listingUri
             };
     }

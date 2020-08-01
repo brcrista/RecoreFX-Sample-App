@@ -18,7 +18,7 @@ namespace FileSync.Common.ApiModels
         public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, Optional<AbsoluteUri> contentUri)
             => new FileSyncFile
             {
-                RelativePath = new Filepath(Path.Combine(relativePath, fileInfo.Name)),
+                RelativePath = relativePath.Combine(new Filepath(fileInfo.Name)),
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
                 Content = contentUri
             };
