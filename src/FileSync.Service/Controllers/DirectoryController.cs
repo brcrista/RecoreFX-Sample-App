@@ -40,7 +40,7 @@ namespace FileSync.Service.Controllers
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     relativePath: new Filepath(path),
-                    contentUri: new RelativeUri("api/v1/listing").Combine(fileInfo.Name));
+                    contentUri: new RelativeUri("api/v1/content").Combine(fileInfo.Name));
             }
         }
     }
