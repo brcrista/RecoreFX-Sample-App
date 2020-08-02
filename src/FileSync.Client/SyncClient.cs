@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Recore;
@@ -31,10 +32,9 @@ namespace FileSync.Client
 
         public async Task RunAsync()
         {
-            var fileStore = fileStoreFactory.Create(new Filepath("."));
-
             // Get the files on the client
             var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new Filepath(".")).ToList();
+
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
@@ -52,8 +52,13 @@ namespace FileSync.Client
 
             foreach (var file in filesToDownload)
             {
+                var dirname = Path.GetDirectoryName(file.RelativePath);
+                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+
+                var basename = Path.GetFileName(file.RelativePath);
                 var content = await fileService.GetFileContentAsync(file);
-                await fileStore.WriteFileAsync(file.RelativePath, content);
+
+                await fileStore.WriteFileAsync(basename, content);
             }
 
             // Upload files to the service
@@ -62,7 +67,12 @@ namespace FileSync.Client
 
             foreach (var file in filesToUpload)
             {
-                var content = await fileStore.ReadFileAsync(file.RelativePath);
+                var dirname = Path.GetDirectoryName(file.RelativePath);
+                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+
+                var basename = Path.GetFileName(file.RelativePath);
+                var content = await fileStore.ReadFileAsync(basename);
+
                 await fileService.PutFileContentAsync(file.RelativePath, content);
             }
 

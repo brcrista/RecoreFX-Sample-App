@@ -14,6 +14,7 @@ namespace FileSync.Common
 
         public FileSystemStore(Filepath filepath)
         {
+            Directory.CreateDirectory(filepath);
             Filepath = filepath;
         }
 
@@ -23,15 +24,15 @@ namespace FileSync.Common
         public IEnumerable<DirectoryInfo> GetDirectories()
             => Directory.EnumerateDirectories(Filepath).Select(dir => new DirectoryInfo(dir));
 
-        public Task<Stream> ReadFileAsync(Filepath relativePath)
+        public Task<Stream> ReadFileAsync(string filename)
         {
-            var pathInStore = Path.Join(Filepath.Value, relativePath.Value);
+            var pathInStore = Path.Join(Filepath.Value, filename);
             return Task.FromResult<Stream>(File.OpenRead(pathInStore));
         }
 
-        public async Task WriteFileAsync(Filepath relativePath, Stream content)
+        public async Task WriteFileAsync(string filename, Stream content)
         {
-            var pathInStore = Path.Join(Filepath.Value, relativePath.Value);
+            var pathInStore = Path.Join(Filepath.Value, filename);
             using var filestream = File.OpenWrite(pathInStore);
             await content.CopyToAsync(filestream);
         }

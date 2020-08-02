@@ -9,21 +9,21 @@ namespace FileSync.Common
         /// <summary>
         /// Lists the files in the file store.
         /// </summary>
-        public IEnumerable<FileInfo> GetFiles();
+        IEnumerable<FileInfo> GetFiles();
 
         /// <summary>
         /// Lists the directories in the file store.
         /// </summary>
-        public IEnumerable<DirectoryInfo> GetDirectories();
+        IEnumerable<DirectoryInfo> GetDirectories();
 
         /// <summary>
         /// Streams the contents of a file in the store.
         /// </summary>
-        public Task<Stream> ReadFileAsync(Filepath path);
+        Task<Stream> ReadFileAsync(string filename);
 
         /// <summary>
         /// Writes the contents of a file in the store.
         /// </summary>
-        public Task WriteFileAsync(Filepath path, Stream content);
+        Task WriteFileAsync(string filename, Stream content);
     }
 }

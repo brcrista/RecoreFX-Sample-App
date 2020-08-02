@@ -21,11 +21,11 @@ namespace FileSync.Service.Controllers
         [HttpGet]
         public async Task<IActionResult> DownloadFileAsync([FromRoute] string path)
         {
-            var dirName = Path.GetDirectoryName(path);
-            var fileStore = fileStoreFactory.Create(new Filepath(dirName));
+            var dirname = Path.GetDirectoryName(path);
+            var fileStore = fileStoreFactory.Create(new Filepath(dirname));
 
-            var name = Path.GetFileName(path);
-            var stream = await fileStore.ReadFileAsync(new Filepath(name));
+            var basename = Path.GetFileName(path);
+            var stream = await fileStore.ReadFileAsync(basename);
 
             return File(stream, MediaTypeNames.Application.Octet);
         }
@@ -38,11 +38,11 @@ namespace FileSync.Service.Controllers
                 return BadRequest();
             }
 
-            var dirName = Path.GetDirectoryName(path);
-            var fileStore = fileStoreFactory.Create(new Filepath(dirName));
+            var dirname = Path.GetDirectoryName(path);
+            var fileStore = fileStoreFactory.Create(new Filepath(dirname));
 
-            var name = Path.GetFileName(path);
-            await fileStore.WriteFileAsync(new Filepath(name), Request.Body);
+            var basename = Path.GetFileName(path);
+            await fileStore.WriteFileAsync(basename, Request.Body);
 
             return CreatedAtAction(nameof(DownloadFileAsync), routeValues: new { path }, value: path);
         }
