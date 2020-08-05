@@ -8,7 +8,7 @@ using FileSync.Common;
 namespace FileSync.Service.Controllers
 {
     [ApiController]
-    [Route("api/v1/content/{path}")]
+    [Route("api/v1/content")]
     public sealed class FileContentV1Controller : ControllerBase
     {
         private readonly FileStoreFactory fileStoreFactory;
@@ -19,7 +19,7 @@ namespace FileSync.Service.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> DownloadFileAsync([FromRoute] string path)
+        public async Task<IActionResult> DownloadFileAsync([FromQuery] string path)
         {
             var dirname = Path.GetDirectoryName(path);
             var fileStore = fileStoreFactory.Create(new Filepath(dirname));
@@ -31,7 +31,7 @@ namespace FileSync.Service.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UploadFileAsync([FromRoute] string path)
+        public async Task<IActionResult> UploadFileAsync([FromQuery] string path)
         {
             if (!Request.Body.CanRead)
             {
