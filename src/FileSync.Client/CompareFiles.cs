@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
     sealed class CompareFiles
     {
-        private readonly Dictionary<Filepath, FileSyncFile> clientFiles;
-        private readonly Dictionary<Filepath, FileSyncFile> serviceFiles;
+        private readonly Dictionary<ForwardSlashFilepath, FileSyncFile> clientFiles;
+        private readonly Dictionary<ForwardSlashFilepath, FileSyncFile> serviceFiles;
 
         public CompareFiles(IEnumerable<FileSyncFile> clientFiles, IEnumerable<FileSyncFile> serviceFiles)
         {

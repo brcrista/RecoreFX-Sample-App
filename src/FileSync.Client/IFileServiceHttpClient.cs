@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Recore;
 
-using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -16,6 +15,6 @@ namespace FileSync.Client
 
         Task<Stream> GetFileContentAsync(FileSyncFile file);
 
-        Task PutFileContentAsync(Filepath path, Stream content);
+        Task PutFileContentAsync(ForwardSlashFilepath path, Stream content);
     }
 }

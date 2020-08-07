@@ -77,7 +77,7 @@ namespace FileSync.Client
             }
 
             // Print summary
-            var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, Filepath>(x => x.RelativePath);
+            var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
 
             view.Out(new SummaryViewComponent(
                 newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),

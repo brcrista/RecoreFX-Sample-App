@@ -6,7 +6,7 @@ namespace FileSync.Common.ApiModels
 {
     public sealed class FileSyncFile
     {
-        public Filepath RelativePath { get; set; }
+        public ForwardSlashFilepath RelativePath { get; set; }
 
         public DateTime LastWriteTimeUtc { get; set; }
 
@@ -18,7 +18,7 @@ namespace FileSync.Common.ApiModels
         public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, Optional<RelativeUri> contentUri)
             => new FileSyncFile
             {
-                RelativePath = relativePath.Combine(new Filepath(fileInfo.Name)),
+                RelativePath = ForwardSlashFilepath.FromFilepath(relativePath).Combine(new ForwardSlashFilepath(fileInfo.Name)),
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
                 ContentUrl = contentUri.OnValue(x => x.ToString())
             };

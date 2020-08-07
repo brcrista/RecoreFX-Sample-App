@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Recore;
 using Recore.Text.Json.Serialization.Converters;
 
-using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -50,9 +49,9 @@ namespace FileSync.Client
                 () => throw new ArgumentNullException(nameof(file.ContentUrl)));
         }
 
-        public async Task PutFileContentAsync(Filepath path, Stream content)
+        public async Task PutFileContentAsync(ForwardSlashFilepath path, Stream content)
         {
-            var response = await httpClient.PutAsync($"api/v1/content/{path}", new StreamContent(content));
+            var response = await httpClient.PutAsync($"api/v1/content?path={path}", new StreamContent(content));
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(response.ReasonPhrase);
