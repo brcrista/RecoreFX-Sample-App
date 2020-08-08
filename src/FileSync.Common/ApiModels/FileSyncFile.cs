@@ -25,23 +25,20 @@ namespace FileSync.Common.ApiModels
         /// </remarks>
         public Optional<string> ContentUrl { get; set; }
 
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, IFileHasher fileHasher)
-            => FromFileInfo(fileInfo, relativePath, fileHasher, contentUri: Optional<RelativeUri>.Empty);
-
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, IFileHasher fileHasher, Optional<RelativeUri> contentUri)
+        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath parentDirectory, IFileHasher fileHasher, bool isServiceFile)
         {
-            var systemFilepath = relativePath.Combine(new Filepath(fileInfo.Name));
+            var systemPath = parentDirectory.Combine(fileInfo.Name);
 
-            var forwardSlashFilepath = ForwardSlashFilepath
-                .FromFilepath(relativePath)
-                .Combine(new ForwardSlashFilepath(fileInfo.Name));
+            var forwardSlashPath = ForwardSlashFilepath
+                .FromFilepath(parentDirectory)
+                .Combine(fileInfo.Name);
 
             return new FileSyncFile
             {
-                RelativePath = forwardSlashFilepath,
+                RelativePath = forwardSlashPath,
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                Sha1 = fileHasher.HashFile(systemFilepath),
-                ContentUrl = contentUri.OnValue(x => x.ToString())
+                Sha1 = fileHasher.HashFile(systemPath),
+                ContentUrl = Optional.If(isServiceFile, $"api/v1/content?path={forwardSlashPath}")
             };
         }
     }

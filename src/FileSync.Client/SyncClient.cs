@@ -93,13 +93,13 @@ namespace FileSync.Client
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
             {
-                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher);
+                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher, isServiceFile: false);
             }
 
             var directories = fileStore.GetDirectories();
             foreach (var directory in directories)
             {
-                var subdirectory = currentDirectory.Combine(new Filepath(directory.Name));
+                var subdirectory = currentDirectory.Combine(directory.Name);
                 var filesInSubdir = GetAllFilesOnClient(fileStoreFactory, subdirectory);
                 foreach (var file in filesInSubdir)
                 {

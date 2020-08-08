@@ -9,6 +9,8 @@ namespace FileSync.Common
         public Filepath() { }
         public Filepath(string value) => Value = value;
 
+        public Filepath Combine(string other) => Combine(new Filepath(other));
+
         public Filepath Combine(Filepath other) => new Filepath(Path.Combine(Value, other));
     }
 }

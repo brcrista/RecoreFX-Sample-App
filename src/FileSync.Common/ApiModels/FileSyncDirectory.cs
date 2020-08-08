@@ -5,13 +5,13 @@ namespace FileSync.Common.ApiModels
 {
     public sealed class FileSyncDirectory
     {
-        public Filepath RelativePath { get; set; }
+        public ForwardSlashFilepath RelativePath { get; set; }
         public string ListingUrl { get; set; }
 
-        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath relativePath, RelativeUri listingUri)
+        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath parentDirectory, RelativeUri listingUri)
             => new FileSyncDirectory
             {
-                RelativePath = relativePath.Combine(new Filepath(directoryInfo.Name)),
+                RelativePath = ForwardSlashFilepath.FromFilepath(parentDirectory).Combine(directoryInfo.Name),
                 ListingUrl = listingUri.ToString()
             };
     }

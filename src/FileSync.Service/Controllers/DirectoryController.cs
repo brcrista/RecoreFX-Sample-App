@@ -23,7 +23,10 @@ namespace FileSync.Service.Controllers
         [HttpGet]
         public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing([FromQuery] string path = ".")
         {
-            var fileStore = fileStoreFactory.Create(new Filepath(path));
+            // Assume that `path` uses forward slashes
+            var forwardSlashPath = new ForwardSlashFilepath(path);
+            var systemPath = forwardSlashPath.ToFilepath();
+            var fileStore = fileStoreFactory.Create(systemPath);
             foreach (var directoryInfo in fileStore.GetDirectories())
             {
                 var relativePath = path + "/" + directoryInfo.Name;
@@ -31,20 +34,17 @@ namespace FileSync.Service.Controllers
 
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
-                    relativePath: new Filepath(path),
+                    parentDirectory: systemPath,
                     listingUri: listingUri);
             }
 
             foreach (var fileInfo in fileStore.GetFiles())
             {
-                var relativePath = path + "/" + fileInfo.Name;
-                var contentUri = new RelativeUri($"api/v1/content?path={relativePath}");
-
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
-                    relativePath: new Filepath(path),
+                    parentDirectory: systemPath,
                     fileHasher,
-                    contentUri: contentUri);
+                    isServiceFile: true);
             }
         }
     }
