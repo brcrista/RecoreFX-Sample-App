@@ -31,6 +31,7 @@ namespace FileSync.Client
         public IEnumerable<Conflict> Conflicts()
             => clientFiles.Keys
                 .Intersect(serviceFiles.Keys)
+                .Where(VersionsAreDifferent)
                 .Select(key => new Conflict(
                     clientFile: clientFiles[key],
                     serviceFile: serviceFiles[key]));
@@ -44,5 +45,13 @@ namespace FileSync.Client
             => clientFiles.Keys
                 .Except(serviceFiles.Keys)
                 .Select(key => clientFiles[key]);
+
+        private bool VersionsAreDifferent(ForwardSlashFilepath path)
+        {
+            var clientFile = clientFiles[path];
+            var serviceFile = serviceFiles[path];
+
+            return serviceFile.Sha1 != clientFile.Sha1;
+        }
     }
 }
