@@ -13,7 +13,10 @@ namespace FileSync.Common.ApiModels
         /// <summary>
         /// The SHA1 checksum of the file.
         /// </summary>
-        public string Sha1 { get; set; }
+        /// <remarks>
+        /// On the client, this will be computed lazily.
+        /// </remarks>
+        public Optional<string> Sha1 { get; set; }
 
         /// <summary>
         /// The service URL to download the file.
@@ -23,10 +26,27 @@ namespace FileSync.Common.ApiModels
         /// </remarks>
         public Optional<string> ContentUrl { get; set; }
 
+        /// <summary>
+        /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
+        /// </summary>
+        /// <remarks>
+        /// This overload skips the fields that the client doesn't use.
+        /// </remarks>
+        public static FileSyncFile FromFileInfo(
+            FileInfo fileInfo,
+            Filepath parentDirectory)
+            => FromFileInfo(fileInfo, parentDirectory, Optional<IFileHasher>.Empty, Optional<RelativeUri>.Empty);
+
+        /// <summary>
+        /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
+        /// </summary>
+        /// <remarks>
+        /// This overload sets all of the fields.
+        /// </remarks>
         public static FileSyncFile FromFileInfo(
             FileInfo fileInfo,
             Filepath parentDirectory,
-            IFileHasher fileHasher,
+            Optional<IFileHasher> fileHasher,
             Optional<RelativeUri> contentEndpoint)
         {
             var systemPath = parentDirectory.Combine(fileInfo.Name);
@@ -39,7 +59,7 @@ namespace FileSync.Common.ApiModels
             {
                 RelativePath = forwardSlashPath,
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                Sha1 = fileHasher.HashFile(systemPath).Value,
+                Sha1 = fileHasher.OnValue(hasher => hasher.HashFile(systemPath).Value),
                 ContentUrl = contentEndpoint.OnValue(endpoint => $"{endpoint}?path={forwardSlashPath}")
             };
         }

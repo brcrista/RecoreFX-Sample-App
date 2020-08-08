@@ -44,7 +44,7 @@ namespace FileSync.Client
             var filesOnService = (await GetAllFilesOnService()).ToList();
             view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
-            var compareFiles = new CompareFiles(filesOnClient, filesOnService);
+            var compareFiles = new CompareFiles(filesOnClient, filesOnService, fileHasher);
 
             // Print a message for conflicts
             view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
@@ -93,7 +93,7 @@ namespace FileSync.Client
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
             {
-                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher, contentEndpoint: Optional<RelativeUri>.Empty);
+                yield return FileSyncFile.FromFileInfo(file, currentDirectory);
             }
 
             var directories = fileStore.GetDirectories();

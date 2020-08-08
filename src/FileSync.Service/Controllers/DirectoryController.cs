@@ -40,7 +40,7 @@ namespace FileSync.Service.Controllers
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     parentDirectory: systemPath,
-                    fileHasher,
+                    Optional.Of(fileHasher),
                     contentEndpoint: new RelativeUri("api/v1/content"));
             }
         }
