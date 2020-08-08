@@ -1,8 +1,6 @@
 ﻿namespace FileSync.Common
 {
-    // This class exists for ASP.NET dependency injection,
-    // which won't take a factory function.
-    public sealed class FileStoreFactory
+    public sealed class FileStoreFactory : IFileStoreFactory
     {
         private readonly SystemFilepath root;
 

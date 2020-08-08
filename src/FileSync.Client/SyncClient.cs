@@ -17,13 +17,13 @@ namespace FileSync.Client
     sealed class SyncClient
     {
         private readonly ITextView view;
-        private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileStoreFactory fileStoreFactory;
         private readonly IFileHasher fileHasher;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
             ITextView view,
-            FileStoreFactory fileStoreFactory,
+            IFileStoreFactory fileStoreFactory,
             IFileHasher fileHasher,
             IFileServiceHttpClient fileService)
         {
@@ -36,7 +36,7 @@ namespace FileSync.Client
         public async Task RunAsync()
         {
             // Get the files on the client
-            var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new SystemFilepath(".")).ToList();
+            var filesOnClient = GetAllFilesOnClient(new SystemFilepath(".")).ToList();
 
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
@@ -88,7 +88,7 @@ namespace FileSync.Client
                 sentFiles: filesToUpload));
         }
 
-        private IEnumerable<FileSyncFile> GetAllFilesOnClient(FileStoreFactory fileStoreFactory, SystemFilepath currentDirectory)
+        private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
         {
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
@@ -100,7 +100,7 @@ namespace FileSync.Client
             foreach (var directory in directories)
             {
                 var subdirectory = currentDirectory.Combine(directory.Name);
-                var filesInSubdir = GetAllFilesOnClient(fileStoreFactory, subdirectory);
+                var filesInSubdir = GetAllFilesOnClient(subdirectory);
                 foreach (var file in filesInSubdir)
                 {
                     yield return file;
