@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <ProjectReference Include="C:\Users\Brian\Code\GitHub\recorefx\RecoreFX\src\Recore.csproj" />
+    <PackageReference Include="RecoreFX" Version="0.8.0" />
   </ItemGroup>
 
   <ItemGroup>
