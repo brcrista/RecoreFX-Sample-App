@@ -29,13 +29,10 @@ namespace FileSync.Service.Controllers
             var fileStore = fileStoreFactory.Create(systemPath);
             foreach (var directoryInfo in fileStore.GetDirectories())
             {
-                var relativePath = path + "/" + directoryInfo.Name;
-                var listingUri = new RelativeUri($"api/v1/listing?path={relativePath}");
-
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
                     parentDirectory: systemPath,
-                    listingUri: listingUri);
+                    listingEndpoint: new RelativeUri($"api/v1/listing"));
             }
 
             foreach (var fileInfo in fileStore.GetFiles())
@@ -44,7 +41,7 @@ namespace FileSync.Service.Controllers
                     fileInfo,
                     parentDirectory: systemPath,
                     fileHasher,
-                    isServiceFile: true);
+                    contentEndpoint: new RelativeUri("api/v1/content"));
             }
         }
     }

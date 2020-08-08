@@ -25,7 +25,11 @@ namespace FileSync.Common.ApiModels
         /// </remarks>
         public Optional<string> ContentUrl { get; set; }
 
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath parentDirectory, IFileHasher fileHasher, bool isServiceFile)
+        public static FileSyncFile FromFileInfo(
+            FileInfo fileInfo,
+            Filepath parentDirectory,
+            IFileHasher fileHasher,
+            Optional<RelativeUri> contentEndpoint)
         {
             var systemPath = parentDirectory.Combine(fileInfo.Name);
 
@@ -38,7 +42,7 @@ namespace FileSync.Common.ApiModels
                 RelativePath = forwardSlashPath,
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
                 Sha1 = fileHasher.HashFile(systemPath),
-                ContentUrl = Optional.If(isServiceFile, $"api/v1/content?path={forwardSlashPath}")
+                ContentUrl = contentEndpoint.OnValue(endpoint => $"{endpoint}?path={forwardSlashPath}")
             };
         }
     }

@@ -8,11 +8,14 @@ namespace FileSync.Common.ApiModels
         public ForwardSlashFilepath RelativePath { get; set; }
         public string ListingUrl { get; set; }
 
-        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath parentDirectory, RelativeUri listingUri)
-            => new FileSyncDirectory
+        public static FileSyncDirectory FromDirectoryInfo(DirectoryInfo directoryInfo, Filepath parentDirectory, RelativeUri listingEndpoint)
+        {
+            var relativePath = ForwardSlashFilepath.FromFilepath(parentDirectory).Combine(directoryInfo.Name);
+            return new FileSyncDirectory
             {
-                RelativePath = ForwardSlashFilepath.FromFilepath(parentDirectory).Combine(directoryInfo.Name),
-                ListingUrl = listingUri.ToString()
+                RelativePath = relativePath,
+                ListingUrl = $"{listingEndpoint}?path={relativePath}"
             };
+        }
     }
 }

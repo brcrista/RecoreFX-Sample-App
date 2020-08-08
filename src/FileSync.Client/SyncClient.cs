@@ -93,7 +93,7 @@ namespace FileSync.Client
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
             {
-                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher, isServiceFile: false);
+                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher, contentEndpoint: Optional<RelativeUri>.Empty);
             }
 
             var directories = fileStore.GetDirectories();
