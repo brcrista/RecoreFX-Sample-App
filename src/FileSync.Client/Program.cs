@@ -30,6 +30,7 @@ namespace FileSync.Client
                 var syncClient = new SyncClient(
                     view: new ConsoleView { IsVerbose = true },
                     fileStoreFactory: fileStoreFactory,
+                    fileHasher: new FileHasher(),
                     fileService: new FileServiceHttpClient(httpClient));
 
                 await syncClient.RunAsync();

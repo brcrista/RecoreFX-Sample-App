@@ -18,15 +18,18 @@ namespace FileSync.Client
     {
         private readonly ITextView view;
         private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileHasher fileHasher;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
             ITextView view,
             FileStoreFactory fileStoreFactory,
+            IFileHasher fileHasher,
             IFileServiceHttpClient fileService)
         {
             this.view = view;
             this.fileStoreFactory = fileStoreFactory;
+            this.fileHasher = fileHasher;
             this.fileService = fileService;
         }
 
@@ -90,7 +93,7 @@ namespace FileSync.Client
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
             {
-                yield return FileSyncFile.FromFileInfo(file, currentDirectory);
+                yield return FileSyncFile.FromFileInfo(file, currentDirectory, fileHasher);
             }
 
             var directories = fileStore.GetDirectories();

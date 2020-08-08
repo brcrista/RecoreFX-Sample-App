@@ -12,10 +12,12 @@ namespace FileSync.Service.Controllers
     public sealed class DirectoryV1Controller : ControllerBase
     {
         private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileHasher fileHasher;
 
-        public DirectoryV1Controller(FileStoreFactory fileStoreFactory)
+        public DirectoryV1Controller(FileStoreFactory fileStoreFactory, IFileHasher fileHasher)
         {
             this.fileStoreFactory = fileStoreFactory;
+            this.fileHasher = fileHasher;
         }
 
         [HttpGet]
@@ -41,6 +43,7 @@ namespace FileSync.Service.Controllers
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     relativePath: new Filepath(path),
+                    fileHasher,
                     contentUri: contentUri);
             }
         }
