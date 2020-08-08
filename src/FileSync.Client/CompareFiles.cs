@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
+using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
@@ -9,11 +9,13 @@ namespace FileSync.Client
     {
         private readonly Dictionary<ForwardSlashFilepath, FileSyncFile> clientFiles;
         private readonly Dictionary<ForwardSlashFilepath, FileSyncFile> serviceFiles;
+        private readonly IFileHasher fileHasher;
 
-        public CompareFiles(IEnumerable<FileSyncFile> clientFiles, IEnumerable<FileSyncFile> serviceFiles)
+        public CompareFiles(IEnumerable<FileSyncFile> clientFiles, IEnumerable<FileSyncFile> serviceFiles, IFileHasher fileHasher)
         {
             this.clientFiles = clientFiles.ToDictionary(x => x.RelativePath);
             this.serviceFiles = serviceFiles.ToDictionary(x => x.RelativePath);
+            this.fileHasher = fileHasher;
         }
 
         public IEnumerable<FileSyncFile> FilesToDownload()
@@ -31,6 +33,7 @@ namespace FileSync.Client
         public IEnumerable<Conflict> Conflicts()
             => clientFiles.Keys
                 .Intersect(serviceFiles.Keys)
+                .Where(VersionsAreDifferent)
                 .Select(key => new Conflict(
                     clientFile: clientFiles[key],
                     serviceFile: serviceFiles[key]));
@@ -44,5 +47,21 @@ namespace FileSync.Client
             => clientFiles.Keys
                 .Except(serviceFiles.Keys)
                 .Select(key => clientFiles[key]);
+
+        private bool VersionsAreDifferent(ForwardSlashFilepath path)
+        {
+            var clientFile = clientFiles[path];
+            var serviceFile = serviceFiles[path];
+
+            // In practice, clientFile's SHA should always be empty,
+            // but it doesn't hurt to check.
+            if (!clientFile.Sha1.HasValue)
+            {
+                var systemPath = path.ToFilepath();
+                clientFile.Sha1 = fileHasher.HashFile(systemPath).Value;
+            }
+
+            return serviceFile.Sha1 != clientFile.Sha1;
+        }
     }
 }

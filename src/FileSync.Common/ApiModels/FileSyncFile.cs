@@ -10,17 +10,58 @@ namespace FileSync.Common.ApiModels
 
         public DateTime LastWriteTimeUtc { get; set; }
 
+        /// <summary>
+        /// The SHA1 checksum of the file.
+        /// </summary>
+        /// <remarks>
+        /// On the client, this will be computed lazily.
+        /// </remarks>
+        public Optional<string> Sha1 { get; set; }
+
+        /// <summary>
+        /// The service URL to download the file.
+        /// </summary>
+        /// <remarks>
+        /// This is empty for files on the client.
+        /// </remarks>
         public Optional<string> ContentUrl { get; set; }
 
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath)
-            => FromFileInfo(fileInfo, relativePath, contentUri: Optional<RelativeUri>.Empty);
+        /// <summary>
+        /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
+        /// </summary>
+        /// <remarks>
+        /// This overload skips the fields that the client doesn't use.
+        /// </remarks>
+        public static FileSyncFile FromFileInfo(
+            FileInfo fileInfo,
+            Filepath parentDirectory)
+            => FromFileInfo(fileInfo, parentDirectory, Optional<IFileHasher>.Empty, Optional<RelativeUri>.Empty);
 
-        public static FileSyncFile FromFileInfo(FileInfo fileInfo, Filepath relativePath, Optional<RelativeUri> contentUri)
-            => new FileSyncFile
+        /// <summary>
+        /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
+        /// </summary>
+        /// <remarks>
+        /// This overload sets all of the fields.
+        /// </remarks>
+        public static FileSyncFile FromFileInfo(
+            FileInfo fileInfo,
+            Filepath parentDirectory,
+            Optional<IFileHasher> fileHasher,
+            Optional<RelativeUri> contentEndpoint)
+        {
+            var systemPath = parentDirectory.Combine(fileInfo.Name);
+
+            var forwardSlashPath = ForwardSlashFilepath
+                .FromFilepath(parentDirectory)
+                .Combine(fileInfo.Name);
+
+            return new FileSyncFile
             {
-                RelativePath = ForwardSlashFilepath.FromFilepath(relativePath).Combine(new ForwardSlashFilepath(fileInfo.Name)),
+                RelativePath = forwardSlashPath,
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                ContentUrl = contentUri.OnValue(x => x.ToString())
+                Sha1 = fileHasher.OnValue(hasher => hasher.HashFile(systemPath).Value),
+                ContentUrl = contentEndpoint.OnValue(endpoint => $"{endpoint}?path={forwardSlashPath}")
             };
+        }
     }
 }

@@ -18,15 +18,18 @@ namespace FileSync.Client
     {
         private readonly ITextView view;
         private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileHasher fileHasher;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
             ITextView view,
             FileStoreFactory fileStoreFactory,
+            IFileHasher fileHasher,
             IFileServiceHttpClient fileService)
         {
             this.view = view;
             this.fileStoreFactory = fileStoreFactory;
+            this.fileHasher = fileHasher;
             this.fileService = fileService;
         }
 
@@ -41,7 +44,7 @@ namespace FileSync.Client
             var filesOnService = (await GetAllFilesOnService()).ToList();
             view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
-            var compareFiles = new CompareFiles(filesOnClient, filesOnService);
+            var compareFiles = new CompareFiles(filesOnClient, filesOnService, fileHasher);
 
             // Print a message for conflicts
             view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
@@ -96,7 +99,7 @@ namespace FileSync.Client
             var directories = fileStore.GetDirectories();
             foreach (var directory in directories)
             {
-                var subdirectory = currentDirectory.Combine(new Filepath(directory.Name));
+                var subdirectory = currentDirectory.Combine(directory.Name);
                 var filesInSubdir = GetAllFilesOnClient(fileStoreFactory, subdirectory);
                 foreach (var file in filesInSubdir)
                 {

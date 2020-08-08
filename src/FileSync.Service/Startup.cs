@@ -20,6 +20,7 @@ namespace FileSync.Service
 
             services
                 .AddSingleton(fileStoreFactory)
+                .AddSingleton<IFileHasher, FileHasher>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }

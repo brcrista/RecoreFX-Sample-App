@@ -1,4 +1,5 @@
-﻿using Recore;
+﻿using System.IO;
+using Recore;
 
 namespace FileSync.Common.ApiModels
 {
@@ -18,8 +19,14 @@ namespace FileSync.Common.ApiModels
         public ForwardSlashFilepath() { }
         public ForwardSlashFilepath(string value) => Value = value;
 
+        public ForwardSlashFilepath Combine(string other)
+            => Combine(new ForwardSlashFilepath(other));
+
         public ForwardSlashFilepath Combine(ForwardSlashFilepath other)
             => new ForwardSlashFilepath(Value + "/" + other);
+
+        public Filepath ToFilepath()
+            => new Filepath(Value.Replace('/', Path.DirectorySeparatorChar));
 
         public static ForwardSlashFilepath FromFilepath(Filepath filepath)
             => new ForwardSlashFilepath(filepath.Value.Replace('\\', '/'));
