@@ -34,7 +34,7 @@ namespace FileSync.Common.ApiModels
         /// </remarks>
         public static FileSyncFile FromFileInfo(
             FileInfo fileInfo,
-            Filepath parentDirectory)
+            SystemFilepath parentDirectory)
             => FromFileInfo(fileInfo, parentDirectory, Optional<IFileHasher>.Empty, Optional<RelativeUri>.Empty);
 
         /// <summary>
@@ -45,14 +45,14 @@ namespace FileSync.Common.ApiModels
         /// </remarks>
         public static FileSyncFile FromFileInfo(
             FileInfo fileInfo,
-            Filepath parentDirectory,
+            SystemFilepath parentDirectory,
             Optional<IFileHasher> fileHasher,
             Optional<RelativeUri> contentEndpoint)
         {
             var systemPath = parentDirectory.Combine(fileInfo.Name);
 
             var forwardSlashPath = ForwardSlashFilepath
-                .FromFilepath(parentDirectory)
+                .FromSystemFilepath(parentDirectory)
                 .Combine(fileInfo.Name);
 
             return new FileSyncFile

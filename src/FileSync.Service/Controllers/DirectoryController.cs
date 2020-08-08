@@ -11,10 +11,10 @@ namespace FileSync.Service.Controllers
     [Route("api/v1/listing")]
     public sealed class DirectoryV1Controller : ControllerBase
     {
-        private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileStoreFactory fileStoreFactory;
         private readonly IFileHasher fileHasher;
 
-        public DirectoryV1Controller(FileStoreFactory fileStoreFactory, IFileHasher fileHasher)
+        public DirectoryV1Controller(IFileStoreFactory fileStoreFactory, IFileHasher fileHasher)
         {
             this.fileStoreFactory = fileStoreFactory;
             this.fileHasher = fileHasher;

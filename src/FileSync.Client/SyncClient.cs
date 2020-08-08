@@ -17,13 +17,13 @@ namespace FileSync.Client
     sealed class SyncClient
     {
         private readonly ITextView view;
-        private readonly FileStoreFactory fileStoreFactory;
+        private readonly IFileStoreFactory fileStoreFactory;
         private readonly IFileHasher fileHasher;
         private readonly IFileServiceHttpClient fileService;
 
         public SyncClient(
             ITextView view,
-            FileStoreFactory fileStoreFactory,
+            IFileStoreFactory fileStoreFactory,
             IFileHasher fileHasher,
             IFileServiceHttpClient fileService)
         {
@@ -36,7 +36,7 @@ namespace FileSync.Client
         public async Task RunAsync()
         {
             // Get the files on the client
-            var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new Filepath(".")).ToList();
+            var filesOnClient = GetAllFilesOnClient(new SystemFilepath(".")).ToList();
 
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
@@ -56,7 +56,7 @@ namespace FileSync.Client
             foreach (var file in filesToDownload)
             {
                 var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                 var basename = Path.GetFileName(file.RelativePath);
                 var content = await fileService.GetFileContentAsync(file);
@@ -71,7 +71,7 @@ namespace FileSync.Client
             foreach (var file in filesToUpload)
             {
                 var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                 var basename = Path.GetFileName(file.RelativePath);
                 var content = await fileStore.ReadFileAsync(basename);
@@ -88,7 +88,7 @@ namespace FileSync.Client
                 sentFiles: filesToUpload));
         }
 
-        private IEnumerable<FileSyncFile> GetAllFilesOnClient(FileStoreFactory fileStoreFactory, Filepath currentDirectory)
+        private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
         {
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
@@ -100,7 +100,7 @@ namespace FileSync.Client
             foreach (var directory in directories)
             {
                 var subdirectory = currentDirectory.Combine(directory.Name);
-                var filesInSubdir = GetAllFilesOnClient(fileStoreFactory, subdirectory);
+                var filesInSubdir = GetAllFilesOnClient(subdirectory);
                 foreach (var file in filesInSubdir)
                 {
                     yield return file;
@@ -112,9 +112,7 @@ namespace FileSync.Client
         {
             async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(Optional<RelativeUri> listingUri)
             {
-                var listing = await listingUri.Switch(
-                    async x => await fileService.GetDirectoryListingAsync(x),
-                    async () => await fileService.GetDirectoryListingAsync());
+                var listing = await fileService.GetDirectoryListingAsync(listingUri);
 
                 var result = new LinkedList<FileSyncFile>();
                 foreach (var entry in listing)

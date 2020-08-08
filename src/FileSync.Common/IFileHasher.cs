@@ -5,6 +5,6 @@ namespace FileSync.Common
 {
     public interface IFileHasher
     {
-        Ciphertext<SHA1> HashFile(Filepath filepath);
+        Ciphertext<SHA1> HashFile(SystemFilepath filepath);
     }
 }

@@ -8,11 +8,11 @@ namespace FileSync.Common
     /// <summary>
     /// A file store backed by the local file system.
     /// </summary>
-    public sealed class FileSystemStore : IFileStore
+    sealed class FileSystemStore : IFileStore
     {
-        public Filepath Filepath { get; }
+        public SystemFilepath Filepath { get; }
 
-        public FileSystemStore(Filepath filepath)
+        public FileSystemStore(SystemFilepath filepath)
         {
             Directory.CreateDirectory(filepath);
             Filepath = filepath;

@@ -13,13 +13,10 @@ namespace FileSync.Service
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var fileStoreFactory = Pipeline.Of(Directory.GetCurrentDirectory())
-                .Then(x => new Filepath(x))
-                .Then(x => new FileStoreFactory(x))
-                .Result;
+            var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
 
             services
-                .AddSingleton(fileStoreFactory)
+                .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);

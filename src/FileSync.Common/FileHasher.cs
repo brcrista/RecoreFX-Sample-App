@@ -7,7 +7,7 @@ namespace FileSync.Common
 {
     public sealed class FileHasher : IFileHasher
     {
-        public Ciphertext<SHA1> HashFile(Filepath filepath)
+        public Ciphertext<SHA1> HashFile(SystemFilepath filepath)
         {
             var fileContents = File.ReadAllText(filepath.Value);
             return Ciphertext.SHA1(fileContents, salt: Array.Empty<byte>());
