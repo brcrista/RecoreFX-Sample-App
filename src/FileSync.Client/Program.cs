@@ -16,7 +16,7 @@ namespace FileSync.Client
             try
             {
                 var fileStoreFactory = Pipeline.Of(Directory.GetCurrentDirectory())
-                    .Then(x => new Filepath(x))
+                    .Then(x => new SystemFilepath(x))
                     .Then(x => new FileStoreFactory(x))
                     .Result;
 

@@ -10,9 +10,9 @@ namespace FileSync.Common
     /// </summary>
     public sealed class FileSystemStore : IFileStore
     {
-        public Filepath Filepath { get; }
+        public SystemFilepath Filepath { get; }
 
-        public FileSystemStore(Filepath filepath)
+        public FileSystemStore(SystemFilepath filepath)
         {
             Directory.CreateDirectory(filepath);
             Filepath = filepath;

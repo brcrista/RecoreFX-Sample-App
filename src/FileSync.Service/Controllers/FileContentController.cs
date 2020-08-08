@@ -22,7 +22,7 @@ namespace FileSync.Service.Controllers
         public async Task<IActionResult> DownloadFileAsync([FromQuery] string path)
         {
             var dirname = Path.GetDirectoryName(path);
-            var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
             var basename = Path.GetFileName(path);
             var stream = await fileStore.ReadFileAsync(basename);
@@ -39,7 +39,7 @@ namespace FileSync.Service.Controllers
             }
 
             var dirname = Path.GetDirectoryName(path);
-            var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
             var basename = Path.GetFileName(path);
             await fileStore.WriteFileAsync(basename, Request.Body);

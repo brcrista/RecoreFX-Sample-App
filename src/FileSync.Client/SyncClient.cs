@@ -36,7 +36,7 @@ namespace FileSync.Client
         public async Task RunAsync()
         {
             // Get the files on the client
-            var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new Filepath(".")).ToList();
+            var filesOnClient = GetAllFilesOnClient(fileStoreFactory, new SystemFilepath(".")).ToList();
 
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
@@ -56,7 +56,7 @@ namespace FileSync.Client
             foreach (var file in filesToDownload)
             {
                 var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                 var basename = Path.GetFileName(file.RelativePath);
                 var content = await fileService.GetFileContentAsync(file);
@@ -71,7 +71,7 @@ namespace FileSync.Client
             foreach (var file in filesToUpload)
             {
                 var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new Filepath(dirname));
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                 var basename = Path.GetFileName(file.RelativePath);
                 var content = await fileStore.ReadFileAsync(basename);
@@ -88,7 +88,7 @@ namespace FileSync.Client
                 sentFiles: filesToUpload));
         }
 
-        private IEnumerable<FileSyncFile> GetAllFilesOnClient(FileStoreFactory fileStoreFactory, Filepath currentDirectory)
+        private IEnumerable<FileSyncFile> GetAllFilesOnClient(FileStoreFactory fileStoreFactory, SystemFilepath currentDirectory)
         {
             var fileStore = fileStoreFactory.Create(currentDirectory);
             foreach (var file in fileStore.GetFiles())
