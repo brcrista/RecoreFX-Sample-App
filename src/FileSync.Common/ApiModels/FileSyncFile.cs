@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
 using Recore;
-using Recore.Security.Cryptography;
 
 namespace FileSync.Common.ApiModels
 {
@@ -15,7 +13,7 @@ namespace FileSync.Common.ApiModels
         /// <summary>
         /// The SHA1 checksum of the file.
         /// </summary>
-        public Ciphertext<SHA1> Sha1 { get; set; }
+        public string Sha1 { get; set; }
 
         /// <summary>
         /// The service URL to download the file.
@@ -41,7 +39,7 @@ namespace FileSync.Common.ApiModels
             {
                 RelativePath = forwardSlashPath,
                 LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                Sha1 = fileHasher.HashFile(systemPath),
+                Sha1 = fileHasher.HashFile(systemPath).Value,
                 ContentUrl = contentEndpoint.OnValue(endpoint => $"{endpoint}?path={forwardSlashPath}")
             };
         }
