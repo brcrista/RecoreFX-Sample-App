@@ -9,9 +9,7 @@ namespace FileSync.Client
 {
     interface IFileServiceHttpClient
     {
-        Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync();
-
-        Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync(RelativeUri listingUri);
+        Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync(Optional<RelativeUri> listingUri);
 
         Task<Stream> GetFileContentAsync(FileSyncFile file);
 

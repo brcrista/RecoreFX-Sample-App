@@ -112,9 +112,7 @@ namespace FileSync.Client
         {
             async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(Optional<RelativeUri> listingUri)
             {
-                var listing = await listingUri.Switch(
-                    async x => await fileService.GetDirectoryListingAsync(x),
-                    async () => await fileService.GetDirectoryListingAsync());
+                var listing = await fileService.GetDirectoryListingAsync(listingUri);
 
                 var result = new LinkedList<FileSyncFile>();
                 foreach (var entry in listing)

@@ -33,21 +33,17 @@ namespace FileSync.Client
                     deserializeAsLeft: json => json.TryGetProperty("listingUrl", out JsonElement _)));
         }
 
-        public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync()
-            => await GetDirectoryListingAsync(new RelativeUri("api/v1/listing"));
-
-        public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync(RelativeUri listingUri)
-        {
-            var body = await httpClient.GetStreamAsync(listingUri);
-            return await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(body, jsonOptions);
-        }
+        public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync(Optional<RelativeUri> listingUri)
+            => await Pipeline.Of(listingUri)
+                .Then(uri => uri.ValueOr(new RelativeUri("api/v1/listing")))
+                .Then(uri => httpClient.GetStreamAsync(uri))
+                .Then(async body => await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(await body, jsonOptions))
+                .Result;
 
         public async Task<Stream> GetFileContentAsync(FileSyncFile file)
-        {
-            return await file.ContentUrl.Switch(
+            => await file.ContentUrl.Switch(
                 async x => await httpClient.GetStreamAsync(x),
                 () => throw new ArgumentNullException(nameof(file.ContentUrl)));
-        }
 
         public async Task PutFileContentAsync(ForwardSlashFilepath path, Stream content)
         {
