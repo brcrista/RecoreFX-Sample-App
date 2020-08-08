@@ -15,6 +15,11 @@ namespace FileSync.Client
         {
             try
             {
+                var fileStoreFactory = Pipeline.Of(Directory.GetCurrentDirectory())
+                    .Then(x => new Filepath(x))
+                    .Then(x => new FileStoreFactory(x))
+                    .Result;
+
                 // Use a single HTTP client for connection pooling
                 // (not that it really matters in this application)
                 var httpClient = new HttpClient
@@ -24,7 +29,7 @@ namespace FileSync.Client
 
                 var syncClient = new SyncClient(
                     view: new ConsoleView { IsVerbose = true },
-                    fileStore: new FileSystemStore(new Filepath(Directory.GetCurrentDirectory())),
+                    fileStoreFactory: fileStoreFactory,
                     fileService: new FileServiceHttpClient(httpClient));
 
                 await syncClient.RunAsync();
