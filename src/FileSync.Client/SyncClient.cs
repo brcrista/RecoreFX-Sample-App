@@ -37,16 +37,14 @@ namespace FileSync.Client
         {
             // Get the files on the client
             var filesOnClient = GetAllFilesOnClient(new SystemFilepath(".")).ToList();
-
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
             var filesOnService = (await GetAllFilesOnService()).ToList();
             view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
+            // Find and resolve conflicts
             var compareFiles = new CompareFiles(filesOnClient, filesOnService, fileHasher);
-
-            // Print a message for conflicts
             view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
 
             // Download file content from the service
@@ -81,7 +79,6 @@ namespace FileSync.Client
 
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
-
             view.Out(new SummaryViewComponent(
                 newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
                 changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList(),
