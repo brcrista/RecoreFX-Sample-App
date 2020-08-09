@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <BaseOutputPath>../../bin/$(MSBuildProjectName)</BaseOutputPath>
+    <BaseIntermediateOutputPath>../../obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
