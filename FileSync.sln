@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Common", "FileSync.Common\FileSync.Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Common", "src\FileSync.Common\FileSync.Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Client", "FileSync.Client\FileSync.Client.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Client", "src\FileSync.Client\FileSync.Client.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Service", "FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Service", "src\FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndToEndTests", "test\EndToEndTests\EndToEndTests.csproj", "{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,5 +60,17 @@ Global
 		{2559E86A-2F8C-4D48-B3F9-387497B8DA29}.Release|x64.Build.0 = Release|Any CPU
 		{2559E86A-2F8C-4D48-B3F9-387497B8DA29}.Release|x86.ActiveCfg = Release|Any CPU
 		{2559E86A-2F8C-4D48-B3F9-387497B8DA29}.Release|x86.Build.0 = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|x64.Build.0 = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|x64.ActiveCfg = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|x64.Build.0 = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
