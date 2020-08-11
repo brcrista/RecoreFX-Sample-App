@@ -6,7 +6,7 @@ using FileSync.Common;
 
 namespace FileSync.Tests.SharedMocks
 {
-    public static class MockFileHasher
+    public static class FileHasherMock
     {
         /// <summary>
         /// The SHA1 hash of the empty string.

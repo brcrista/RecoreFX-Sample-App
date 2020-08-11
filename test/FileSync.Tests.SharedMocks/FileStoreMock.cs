@@ -7,7 +7,7 @@ using FileSync.Common;
 
 namespace FileSync.Tests.SharedMocks
 {
-    public static class MockFileStore
+    public static class FileStoreMock
     {
         /// <summary>
         /// The default value of <see cref="FileInfo.LastWriteTimeUtc"/>.

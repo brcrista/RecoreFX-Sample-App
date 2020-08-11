@@ -16,7 +16,7 @@ namespace FileSync.Service.Tests
         [Fact]
         public void GetListingRootDirectory()
         {
-            var fileStore = MockFileStore.Mock(
+            var fileStore = FileStoreMock.Mock(
                 new[]
                 {
                     new DirectoryInfo("directory")
@@ -28,8 +28,8 @@ namespace FileSync.Service.Tests
                 });
 
             var controller = new DirectoryV1Controller(
-                MockFileStore.MockFactory(fileStore).Object,
-                MockFileHasher.Mock().Object);
+                FileStoreMock.MockFactory(fileStore).Object,
+                FileHasherMock.Mock().Object);
 
             var actual = controller.GetListing().ToArray();
 
@@ -43,15 +43,15 @@ namespace FileSync.Service.Tests
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./hello.txt"),
-                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
-                    Sha1 = MockFileHasher.EmptySha1Hash,
+                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
+                    Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./world.txt"),
-                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
-                    Sha1 = MockFileHasher.EmptySha1Hash,
+                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
+                    Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./world.txt"
                 }
             };
@@ -62,7 +62,7 @@ namespace FileSync.Service.Tests
         [Fact]
         public void GetListingSubdirectory()
         {
-            var fileStore = MockFileStore.Mock(
+            var fileStore = FileStoreMock.Mock(
                 new[]
                 {
                     new DirectoryInfo("directory")
@@ -74,8 +74,8 @@ namespace FileSync.Service.Tests
                 });
 
             var controller = new DirectoryV1Controller(
-                MockFileStore.MockFactory(fileStore).Object,
-                MockFileHasher.Mock().Object);
+                FileStoreMock.MockFactory(fileStore).Object,
+                FileHasherMock.Mock().Object);
 
             var actual = controller.GetListing("./subdirectory").ToArray();
 
@@ -89,15 +89,15 @@ namespace FileSync.Service.Tests
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/hello.txt"),
-                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
-                    Sha1 = MockFileHasher.EmptySha1Hash,
+                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
+                    Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/world.txt"),
-                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
-                    Sha1 = MockFileHasher.EmptySha1Hash,
+                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
+                    Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/world.txt"
                 }
             };
@@ -108,13 +108,13 @@ namespace FileSync.Service.Tests
         [Fact]
         public void GetListingEmptyDirectory()
         {
-            var fileStore = MockFileStore.Mock(
+            var fileStore = FileStoreMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 Enumerable.Empty<FileInfo>());
 
             var controller = new DirectoryV1Controller(
-                MockFileStore.MockFactory(fileStore).Object,
-                MockFileHasher.Mock().Object);
+                FileStoreMock.MockFactory(fileStore).Object,
+                FileHasherMock.Mock().Object);
 
             var actual = controller.GetListing("./empty-directory");
             var expected = Enumerable.Empty<DirectoryListing>();
