@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using Recore;
@@ -14,9 +13,6 @@ namespace FileSync.Service.Tests
 
     public class DirectoryControllerTests
     {
-        // Trying to set `LastWriteTimeUtc` on a `FileInfo` object will throw a `FileNotFoundException`.
-        private static readonly DateTime DefaultFileTimestamp = new DateTime(year: 1601, month: 1, day: 1);
-
         [Fact]
         public void GetListingRootDirectory()
         {
@@ -47,14 +43,14 @@ namespace FileSync.Service.Tests
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./hello.txt"),
-                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
                     Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./world.txt"),
-                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
                     Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./world.txt"
                 }
@@ -93,14 +89,14 @@ namespace FileSync.Service.Tests
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/hello.txt"),
-                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
                     Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/world.txt"),
-                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    LastWriteTimeUtc = MockFileStore.DefaultFileTimestamp,
                     Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/world.txt"
                 }

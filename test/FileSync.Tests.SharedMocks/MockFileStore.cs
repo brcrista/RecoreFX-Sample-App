@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Moq;
 
@@ -8,6 +9,14 @@ namespace FileSync.Tests.SharedMocks
 {
     public static class MockFileStore
     {
+        /// <summary>
+        /// The default value of <see cref="FileInfo.LastWriteTimeUtc"/>.
+        /// </summary>
+        /// <remarks>
+        /// Trying to set <see cref="FileInfo.LastWriteTimeUtc"/> will throw a <see cref="FileNotFoundException"/>.
+        /// </remarks>
+        public static DateTime DefaultFileTimestamp => new DateTime(year: 1601, month: 1, day: 1);
+
         public static Mock<IFileStore> Mock(
             IEnumerable<DirectoryInfo> directoryInfos,
             IEnumerable<FileInfo> fileInfos)

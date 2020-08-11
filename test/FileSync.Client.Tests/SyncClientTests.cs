@@ -14,9 +14,6 @@ namespace FileSync.Service.Tests
 
     public class SyncClientTests
     {
-        // Trying to set `LastWriteTimeUtc` on a `FileInfo` object will throw a `FileNotFoundException`.
-        private static readonly DateTime DefaultFileTimestamp = new DateTime(year: 1601, month: 1, day: 1);
-
         [Fact]
         public void NoFilesOnClientOrService()
         {
