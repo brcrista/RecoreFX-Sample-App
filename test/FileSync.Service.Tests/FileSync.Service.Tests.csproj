@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -16,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/FileSync.Common/FileSync.Common.csproj" />
     <ProjectReference Include="../../src/FileSync.Service/FileSync.Service.csproj" />
+    <ProjectReference Include="../FileSync.Tests.SharedMocks/FileSync.Tests.SharedMocks.csproj" />
   </ItemGroup>
 
 </Project>

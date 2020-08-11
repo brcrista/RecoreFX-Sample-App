@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.Linq;
-using FileSync.Common;
+using Recore;
+using Xunit;
+
 using FileSync.Common.ApiModels;
 using FileSync.Service.Controllers;
-using Moq;
-using Recore;
-using Recore.Security.Cryptography;
-using Xunit;
+using FileSync.Tests.SharedMocks;
 
 namespace FileSync.Service.Tests
 {
@@ -15,45 +14,26 @@ namespace FileSync.Service.Tests
 
     public class DirectoryControllerTests
     {
-        // The SHA1 hash of the empty string, computed with
-        // printf "" | sha1sum | awk '{print $1}' | xxd -r -p | base64
-        private static readonly string EmptySha1Hash = "2jmj7l5rSw0yVb/vlWAYkK/YBwk=";
-
         // Trying to set `LastWriteTimeUtc` on a `FileInfo` object will throw a `FileNotFoundException`.
         private static readonly DateTime DefaultFileTimestamp = new DateTime(year: 1601, month: 1, day: 1);
 
         [Fact]
         public void GetListingRootDirectory()
         {
-            var fileStore = new Mock<IFileStore>();
-            fileStore
-                .Setup(x => x.GetDirectories())
-                .Returns(() => new[]
+            var fileStore = MockFileStore.Mock(
+                new[]
                 {
                     new DirectoryInfo("directory")
-                });
-
-            fileStore
-                .Setup(x => x.GetFiles())
-                .Returns(() => new[]
+                },
+                new[]
                 {
                     new FileInfo("hello.txt"),
                     new FileInfo("world.txt")
                 });
 
-            var fileStoreFactory = new Mock<IFileStoreFactory>();
-            fileStoreFactory
-                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
-                .Returns(fileStore.Object);
-
-            var fileHasher = new Mock<IFileHasher>();
-            fileHasher
-                .Setup(x => x.HashFile(It.IsAny<SystemFilepath>()))
-                .Returns(() => Ciphertext.SHA1(plaintext: string.Empty, salt: Array.Empty<byte>()));
-
             var controller = new DirectoryV1Controller(
-                fileStoreFactory.Object,
-                fileHasher.Object);
+                MockFileStore.MockFactory(fileStore).Object,
+                MockFileHasher.Mock().Object);
 
             var actual = controller.GetListing().ToArray();
 
@@ -68,14 +48,14 @@ namespace FileSync.Service.Tests
                 {
                     RelativePath = new ForwardSlashFilepath("./hello.txt"),
                     LastWriteTimeUtc = DefaultFileTimestamp,
-                    Sha1 = EmptySha1Hash,
+                    Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./world.txt"),
                     LastWriteTimeUtc = DefaultFileTimestamp,
-                    Sha1 = EmptySha1Hash,
+                    Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./world.txt"
                 }
             };
@@ -86,35 +66,20 @@ namespace FileSync.Service.Tests
         [Fact]
         public void GetListingSubdirectory()
         {
-            var fileStore = new Mock<IFileStore>();
-            fileStore
-                .Setup(x => x.GetDirectories())
-                .Returns(() => new[]
+            var fileStore = MockFileStore.Mock(
+                new[]
                 {
                     new DirectoryInfo("directory")
-                });
-
-            fileStore
-                .Setup(x => x.GetFiles())
-                .Returns(() => new[]
+                },
+                new[]
                 {
                     new FileInfo("hello.txt"),
                     new FileInfo("world.txt")
                 });
 
-            var fileStoreFactory = new Mock<IFileStoreFactory>();
-            fileStoreFactory
-                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
-                .Returns(fileStore.Object);
-
-            var fileHasher = new Mock<IFileHasher>();
-            fileHasher
-                .Setup(x => x.HashFile(It.IsAny<SystemFilepath>()))
-                .Returns(() => Ciphertext.SHA1(plaintext: string.Empty, salt: Array.Empty<byte>()));
-
             var controller = new DirectoryV1Controller(
-                fileStoreFactory.Object,
-                fileHasher.Object);
+                MockFileStore.MockFactory(fileStore).Object,
+                MockFileHasher.Mock().Object);
 
             var actual = controller.GetListing("./subdirectory").ToArray();
 
@@ -129,14 +94,14 @@ namespace FileSync.Service.Tests
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/hello.txt"),
                     LastWriteTimeUtc = DefaultFileTimestamp,
-                    Sha1 = EmptySha1Hash,
+                    Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/hello.txt"
                 },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./subdirectory/world.txt"),
                     LastWriteTimeUtc = DefaultFileTimestamp,
-                    Sha1 = EmptySha1Hash,
+                    Sha1 = MockFileHasher.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/world.txt"
                 }
             };
@@ -147,28 +112,13 @@ namespace FileSync.Service.Tests
         [Fact]
         public void GetListingEmptyDirectory()
         {
-            var fileStore = new Mock<IFileStore>();
-            fileStore
-                .Setup(x => x.GetDirectories())
-                .Returns(Enumerable.Empty<DirectoryInfo>());
-
-            fileStore
-                .Setup(x => x.GetFiles())
-                .Returns(Enumerable.Empty<FileInfo>());
-
-            var fileStoreFactory = new Mock<IFileStoreFactory>();
-            fileStoreFactory
-                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
-                .Returns(fileStore.Object);
-
-            var fileHasher = new Mock<IFileHasher>();
-            fileHasher
-                .Setup(x => x.HashFile(It.IsAny<SystemFilepath>()))
-                .Returns(() => Ciphertext.SHA1(plaintext: string.Empty, salt: Array.Empty<byte>()));
+            var fileStore = MockFileStore.Mock(
+                Enumerable.Empty<DirectoryInfo>(),
+                Enumerable.Empty<FileInfo>());
 
             var controller = new DirectoryV1Controller(
-                fileStoreFactory.Object,
-                fileHasher.Object);
+                MockFileStore.MockFactory(fileStore).Object,
+                MockFileHasher.Mock().Object);
 
             var actual = controller.GetListing("./empty-directory");
             var expected = Enumerable.Empty<DirectoryListing>();

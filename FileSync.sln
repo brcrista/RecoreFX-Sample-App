@@ -1,19 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Common", "src\FileSync.Common\FileSync.Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Common", "src\FileSync.Common\FileSync.Common.csproj", "{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Client", "src\FileSync.Client\FileSync.Client.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Client", "src\FileSync.Client\FileSync.Client.csproj", "{30491CFF-41E6-49B8-B4B4-142FD494DF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Service", "src\FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Service", "src\FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndToEndTests", "test\EndToEndTests\EndToEndTests.csproj", "{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndToEndTests", "test\EndToEndTests\EndToEndTests.csproj", "{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Client.Tests", "test\FileSync.Client.Tests\FileSync.Client.Tests.csproj", "{ECE0351C-A8C7-41EC-8217-7D40F5CFBEA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Client.Tests", "test\FileSync.Client.Tests\FileSync.Client.Tests.csproj", "{ECE0351C-A8C7-41EC-8217-7D40F5CFBEA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSync.Service.Tests", "test\FileSync.Service.Tests\FileSync.Service.Tests.csproj", "{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Service.Tests", "test\FileSync.Service.Tests\FileSync.Service.Tests.csproj", "{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Tests.SharedMocks", "test\FileSync.Tests.SharedMocks\FileSync.Tests.SharedMocks.csproj", "{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,9 +25,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1AA16FEC-5F9A-4D71-8282-EA91C4D0A19B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -100,5 +99,23 @@ Global
 		{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}.Release|x64.Build.0 = Release|Any CPU
 		{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}.Release|x86.ActiveCfg = Release|Any CPU
 		{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}.Release|x86.Build.0 = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|x64.Build.0 = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Debug|x86.Build.0 = Debug|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|x64.ActiveCfg = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|x64.Build.0 = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|x86.ActiveCfg = Release|Any CPU
+		{311C323B-E3DC-461D-B4F8-9ECF5D539FAE}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11E7A17A-3096-4958-973C-D19F859CAC02}
 	EndGlobalSection
 EndGlobal
