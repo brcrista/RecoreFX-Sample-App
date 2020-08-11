@@ -1,16 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Moq;
-using Recore;
-using Recore.Collections.Generic;
-using Recore.Security.Cryptography;
-using Xunit;
-
+using System.Linq;
 using FileSync.Common;
 using FileSync.Common.ApiModels;
 using FileSync.Service.Controllers;
-using System.Linq;
+using Moq;
+using Recore;
+using Recore.Security.Cryptography;
+using Xunit;
 
 namespace FileSync.Service.Tests
 {
@@ -26,9 +23,16 @@ namespace FileSync.Service.Tests
         private static readonly DateTime DefaultFileTimestamp = new DateTime(year: 1601, month: 1, day: 1);
 
         [Fact]
-        public void GetListingRootDirectoryFilesOnly()
+        public void GetListingRootDirectory()
         {
             var fileStore = new Mock<IFileStore>();
+            fileStore
+                .Setup(x => x.GetDirectories())
+                .Returns(() => new[]
+                {
+                    new DirectoryInfo("directory")
+                });
+
             fileStore
                 .Setup(x => x.GetFiles())
                 .Returns(() => new[]
@@ -51,8 +55,15 @@ namespace FileSync.Service.Tests
                 fileStoreFactory.Object,
                 fileHasher.Object);
 
+            var actual = controller.GetListing().ToArray();
+
             var expected = new DirectoryListing[]
             {
+                new FileSyncDirectory
+                {
+                    RelativePath = new ForwardSlashFilepath("./directory"),
+                    ListingUrl = "api/v1/listing?path=./directory"
+                },
                 new FileSyncFile
                 {
                     RelativePath = new ForwardSlashFilepath("./hello.txt"),
@@ -69,19 +80,100 @@ namespace FileSync.Service.Tests
                 }
             };
 
-            var actual = controller.GetListing().ToArray();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void GetListingSubdirectory()
+        {
+            var fileStore = new Mock<IFileStore>();
+            fileStore
+                .Setup(x => x.GetDirectories())
+                .Returns(() => new[]
+                {
+                    new DirectoryInfo("directory")
+                });
+
+            fileStore
+                .Setup(x => x.GetFiles())
+                .Returns(() => new[]
+                {
+                    new FileInfo("hello.txt"),
+                    new FileInfo("world.txt")
+                });
+
+            var fileStoreFactory = new Mock<IFileStoreFactory>();
+            fileStoreFactory
+                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
+                .Returns(fileStore.Object);
+
+            var fileHasher = new Mock<IFileHasher>();
+            fileHasher
+                .Setup(x => x.HashFile(It.IsAny<SystemFilepath>()))
+                .Returns(() => Ciphertext.SHA1(plaintext: string.Empty, salt: Array.Empty<byte>()));
+
+            var controller = new DirectoryV1Controller(
+                fileStoreFactory.Object,
+                fileHasher.Object);
+
+            var actual = controller.GetListing("./subdirectory").ToArray();
+
+            var expected = new DirectoryListing[]
+            {
+                new FileSyncDirectory
+                {
+                    RelativePath = new ForwardSlashFilepath("./subdirectory/directory"),
+                    ListingUrl = "api/v1/listing?path=./subdirectory/directory"
+                },
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./subdirectory/hello.txt"),
+                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    Sha1 = EmptySha1Hash,
+                    ContentUrl = "api/v1/content?path=./subdirectory/hello.txt"
+                },
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./subdirectory/world.txt"),
+                    LastWriteTimeUtc = DefaultFileTimestamp,
+                    Sha1 = EmptySha1Hash,
+                    ContentUrl = "api/v1/content?path=./subdirectory/world.txt"
+                }
+            };
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void GetListingSubdirectoryFilesOnly()
-        {
-        }
-
-        [Fact]
         public void GetListingEmptyDirectory()
         {
+            var fileStore = new Mock<IFileStore>();
+            fileStore
+                .Setup(x => x.GetDirectories())
+                .Returns(Enumerable.Empty<DirectoryInfo>());
+
+            fileStore
+                .Setup(x => x.GetFiles())
+                .Returns(Enumerable.Empty<FileInfo>());
+
+            var fileStoreFactory = new Mock<IFileStoreFactory>();
+            fileStoreFactory
+                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
+                .Returns(fileStore.Object);
+
+            var fileHasher = new Mock<IFileHasher>();
+            fileHasher
+                .Setup(x => x.HashFile(It.IsAny<SystemFilepath>()))
+                .Returns(() => Ciphertext.SHA1(plaintext: string.Empty, salt: Array.Empty<byte>()));
+
+            var controller = new DirectoryV1Controller(
+                fileStoreFactory.Object,
+                fileHasher.Object);
+
+            var actual = controller.GetListing("./empty-directory");
+            var expected = Enumerable.Empty<DirectoryListing>();
+
+            Assert.Equal(expected, actual);
         }
     }
 }
