@@ -287,6 +287,17 @@ namespace FileSync.Client.Tests
             textView.Verify(
                 x => x.Verbose(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
                 Times.Once());
+
+            expectedTextViewComponent = new ConflictsViewComponent(conflicts);
+            textView.Verify(
+                x => x.Out(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
+                Times.Once);
+
+            textView.Verify(
+                x => x.Out(It.IsAny<SummaryViewComponent>()),
+                Times.Once());
+
+            textView.VerifyNoOtherCalls();
         }
     }
 }
