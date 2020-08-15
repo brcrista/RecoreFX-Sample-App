@@ -25,7 +25,7 @@ namespace FileSync.Service
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
                     parentDirectory: systemPath,
-                    listingEndpoint: new RelativeUri($"api/v1/listing"));
+                    listingEndpoint: new RelativeUri("api/v1/listing"));
             }
 
             foreach (var fileInfo in fileStore.GetFiles())

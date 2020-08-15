@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using FileSync.Common;
 
-namespace FileSync.Service.Controllers
+namespace FileSync.Service
 {
     [ApiController]
     [Route("api/v1/content")]

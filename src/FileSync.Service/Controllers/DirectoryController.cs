@@ -2,7 +2,7 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using FileSync.Common.ApiModels;
 
-namespace FileSync.Service.Controllers
+namespace FileSync.Service
 {
     [ApiController]
     [Route("api/v1/listing")]
