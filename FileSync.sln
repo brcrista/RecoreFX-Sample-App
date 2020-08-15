@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Client", "src\File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Service", "src\FileSync.Service\FileSync.Service.csproj", "{2559E86A-2F8C-4D48-B3F9-387497B8DA29}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndToEndTests", "test\EndToEndTests\EndToEndTests.csproj", "{0BFACFA4-B1AB-4BA5-BF3E-84DB9A7924B7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Client.Tests", "test\FileSync.Client.Tests\FileSync.Client.Tests.csproj", "{ECE0351C-A8C7-41EC-8217-7D40F5CFBEA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSync.Service.Tests", "test\FileSync.Service.Tests\FileSync.Service.Tests.csproj", "{E773B42F-F3CF-4FEC-948E-FFD5234ACFC8}"
