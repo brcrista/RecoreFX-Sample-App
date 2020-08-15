@@ -1,5 +1,6 @@
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Service
@@ -23,7 +24,7 @@ namespace FileSync.Service
             var systemPath = forwardSlashPath.ToFilepath();
 
             // Fail fast if the directory doesn't exist
-            if (!Directory.Exists(systemPath.Value))
+            if (!Directory.Exists(systemPath))
             {
                 return NotFound();
             }

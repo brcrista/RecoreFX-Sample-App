@@ -14,21 +14,21 @@ namespace FileSync.Service
             this.fileStoreFactory = fileStoreFactory;
         }
 
-        public async Task<Stream> ReadFileContentsAsync(string path)
+        public async Task<Stream> ReadFileContentsAsync(SystemFilepath systemPath)
         {
-            var dirname = Path.GetDirectoryName(path);
+            var dirname = Path.GetDirectoryName(systemPath);
             var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-            var basename = Path.GetFileName(path);
+            var basename = Path.GetFileName(systemPath);
             return await fileStore.ReadFileAsync(basename);
         }
 
-        public async Task WriteFileContentsAsync(string path, Stream contents)
+        public async Task WriteFileContentsAsync(SystemFilepath systemPath, Stream contents)
         {
-            var dirname = Path.GetDirectoryName(path);
+            var dirname = Path.GetDirectoryName(systemPath);
             var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-            var basename = Path.GetFileName(path);
+            var basename = Path.GetFileName(systemPath);
             await fileStore.WriteFileAsync(basename, contents);
         }
     }
