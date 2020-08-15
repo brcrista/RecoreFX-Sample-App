@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Recore;
 
 using FileSync.Common;
 
@@ -18,6 +17,7 @@ namespace FileSync.Service
             services
                 .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
+                .AddSingleton<IDirectoryListingService, DirectoryListingService>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }

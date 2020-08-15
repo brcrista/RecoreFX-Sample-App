@@ -1,8 +1,5 @@
-using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Recore;
-
-using FileSync.Common;
 using FileSync.Common.ApiModels;
 
 namespace FileSync.Service.Controllers
@@ -11,38 +8,27 @@ namespace FileSync.Service.Controllers
     [Route("api/v1/listing")]
     public sealed class DirectoryV1Controller : ControllerBase
     {
-        private readonly IFileStoreFactory fileStoreFactory;
-        private readonly IFileHasher fileHasher;
+        private readonly IDirectoryListingService directoryListingService;
 
-        public DirectoryV1Controller(IFileStoreFactory fileStoreFactory, IFileHasher fileHasher)
+        public DirectoryV1Controller(IDirectoryListingService directoryListingService)
         {
-            this.fileStoreFactory = fileStoreFactory;
-            this.fileHasher = fileHasher;
+            this.directoryListingService = directoryListingService;
         }
 
         [HttpGet]
-        public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing([FromQuery] string path = ".")
+        public IActionResult GetListing([FromQuery] string path = ".")
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
             var systemPath = forwardSlashPath.ToFilepath();
-            var fileStore = fileStoreFactory.Create(systemPath);
-            foreach (var directoryInfo in fileStore.GetDirectories())
+
+            // Fail fast if the directory doesn't exist
+            if (!Directory.Exists(systemPath.Value))
             {
-                yield return FileSyncDirectory.FromDirectoryInfo(
-                    directoryInfo,
-                    parentDirectory: systemPath,
-                    listingEndpoint: new RelativeUri($"api/v1/listing"));
+                return NotFound();
             }
 
-            foreach (var fileInfo in fileStore.GetFiles())
-            {
-                yield return FileSyncFile.FromFileInfo(
-                    fileInfo,
-                    parentDirectory: systemPath,
-                    Optional.Of(fileHasher),
-                    contentEndpoint: new RelativeUri("api/v1/content"));
-            }
+            return Ok(directoryListingService.GetListing(systemPath));
         }
     }
 }
