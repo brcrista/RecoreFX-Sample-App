@@ -53,7 +53,7 @@ namespace FileSync.Client
             view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
 
             var uploadResults = await Task.WhenAll(filesToUpload.Select(file =>
-                Result.Try(async () =>
+                Result.TryAsync(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
@@ -64,19 +64,18 @@ namespace FileSync.Client
                     await fileService.PutFileContentAsync(file.RelativePath, content);
                     return file;
                 })
-                .Catch((HttpRequestException e) =>
+                .CatchAsync((HttpRequestException e) =>
                 {
                     view.Error(new LineViewComponent($"Error uploading file {file.RelativePath}. {e.Message}"));
                     return Task.FromResult(file);
-                })
-                .Await()));
+                })));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
             view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
 
             var downloadResults = await Task.WhenAll(filesToDownload.Select(file =>
-                Result.Try(async () =>
+                Result.TryAsync(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
@@ -87,12 +86,11 @@ namespace FileSync.Client
                     await fileStore.WriteFileAsync(basename, content);
                     return file;
                 })
-                .Catch((HttpRequestException e) =>
+                .CatchAsync((HttpRequestException e) =>
                 {
                     view.Error(new LineViewComponent($"Error downloading file {file.RelativePath}. {e.Message}"));
                     return Task.FromResult(file);
-                })
-                .Await()));
+                })));
 
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
