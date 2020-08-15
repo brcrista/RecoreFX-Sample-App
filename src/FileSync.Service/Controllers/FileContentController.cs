@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System.IO;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,11 @@ namespace FileSync.Service
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
             var systemPath = forwardSlashPath.ToFilepath();
+
+            if (!Directory.Exists(systemPath))
+            {
+                return NotFound();
+            }
 
             var stream = await fileContentService.ReadFileContentsAsync(systemPath);
             return File(stream, MediaTypeNames.Application.Octet);
