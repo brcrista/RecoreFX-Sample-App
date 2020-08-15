@@ -9,15 +9,15 @@ namespace FileSync.Client.UI
         private readonly IReadOnlyList<FileListViewComponent> fileListViews;
 
         public SummaryViewComponent(
+            IReadOnlyList<FileSyncFile> sentFiles,
             IReadOnlyList<FileSyncFile> newFiles,
-            IReadOnlyList<FileSyncFile> changedFiles,
-            IReadOnlyList<FileSyncFile> sentFiles)
+            IReadOnlyList<FileSyncFile> changedFiles)
         {
             fileListViews = new[]
             {
+                new FileListViewComponent($"Sent files: {sentFiles.Count}", sentFiles),
                 new FileListViewComponent($"New files: {newFiles.Count}", newFiles),
-                new FileListViewComponent($"Changed files: {changedFiles.Count}", changedFiles),
-                new FileListViewComponent($"Sent files: {sentFiles.Count}", sentFiles)
+                new FileListViewComponent($"Changed files: {changedFiles.Count}", changedFiles)
             };
         }
 

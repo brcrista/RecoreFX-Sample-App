@@ -80,9 +80,9 @@ namespace FileSync.Client
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
             view.Out(new SummaryViewComponent(
+                sentFiles: filesToUpload,
                 newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
-                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList(),
-                sentFiles: filesToUpload));
+                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList()));
         }
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
