@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Recore;
 
 using FileSync.Client.UI;
@@ -11,24 +12,33 @@ namespace FileSync.Client
 {
     static class Program
     {
+        static void ConfigureServices(IServiceCollection services)
+        {
+            var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
+
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new AbsoluteUri("http://localhost:5000/")
+            };
+
+            services
+                .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
+                .AddSingleton<IFileHasher, FileHasher>()
+                .AddSingleton<ITextView>(new ConsoleView { IsVerbose = true })
+                .AddSingleton(httpClient)
+                .AddSingleton<IFileServiceApi, FileServiceHttpClient>()
+                .AddSingleton<SyncClient>();
+        }
+
         static async Task<int> Main()
         {
             try
             {
-                var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
-
-                // Use a single HTTP client for connection pooling
-                // (not that it really matters in this application)
-                using var httpClient = new HttpClient
-                {
-                    BaseAddress = new AbsoluteUri("http://localhost:5000/")
-                };
-
-                var syncClient = new SyncClient(
-                    view: new ConsoleView { IsVerbose = true },
-                    fileStoreFactory: new FileStoreFactory(currentDirectory),
-                    fileHasher: new FileHasher(),
-                    fileService: new FileServiceHttpClient(httpClient));
+                var syncClient = Pipeline.Of(new ServiceCollection())
+                    .Then(ConfigureServices)
+                    .Then(x => x.BuildServiceProvider())
+                    .Then(x => x.GetService<SyncClient>())
+                    .Result;
 
                 await syncClient.RunAsync();
                 return 0;
