@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 using Moq;
 using Recore;
 using Recore.Collections.Generic;
-using Recore.Security.Cryptography;
 using Xunit;
 
 using FileSync.Client.UI;
-using FileSync.Common;
 using FileSync.Common.ApiModels;
 using FileSync.Tests.SharedMocks;
 
@@ -161,15 +159,25 @@ namespace FileSync.Client.Tests
         }
 
         [Fact]
-        public async Task SameFilesDifferentVersionsOnClientAndService()
+        public async Task SameFilesSameVersionsOnClientAndService()
         {
             var textView = new Mock<ITextView>();
 
             var fileStore = FileStoreMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
-                Enumerable.Empty<FileInfo>());
+                new[]
+                {
+                    new FileInfo("shared-file.txt"),
+                });
 
-            var fileService = new Mock<IFileServiceApi>();
+            var fileService = MockFileServiceApi(new DirectoryListing[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
+                    Sha1 = FileHasherMock.EmptySha1Hash
+                }
+            });
 
             var client = new SyncClient(
                 textView.Object,
@@ -180,13 +188,113 @@ namespace FileSync.Client.Tests
             await client.RunAsync();
 
             // Verify ITextView
-            //VerifyTextView(
-            //    textView,
-            //    filesOnClient: filesOnClient,
-            //    filesOnService: filesOnService,
-            //    filesToUpload: filesOnClient,
-            //    filesToDownload: filesOnService,
-            //    conflicts: Enumerable.Empty<Conflict>());
+            var filesOnClient = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
+                }
+            };
+
+            var filesOnService = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
+                    Sha1 = FileHasherMock.EmptySha1Hash
+                }
+            };
+
+            VerifyTextView(
+                textView,
+                filesOnClient: filesOnClient,
+                filesOnService: filesOnService,
+                filesToUpload: Enumerable.Empty<FileSyncFile>(),
+                filesToDownload: Enumerable.Empty<FileSyncFile>(),
+                conflicts: Enumerable.Empty<Conflict>());
+
+            // Verify IFileStore
+            fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.VerifyNoOtherCalls();
+
+            // Verify IFileServiceApi
+            fileService.Verify(
+                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                Times.Once);
+
+            fileService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task SameFilesDifferentVersionsOnClientAndService()
+        {
+            var textView = new Mock<ITextView>();
+
+            var fileStore = FileStoreMock.Mock(
+                Enumerable.Empty<DirectoryInfo>(),
+                new[]
+                {
+                    new FileInfo("shared-file.txt")
+                });
+
+            var fileService = MockFileServiceApi(new DirectoryListing[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
+                    Sha1 = "1234",
+                    LastWriteTimeUtc = DateTime.UtcNow,
+                }
+            });
+
+            var client = new SyncClient(
+                textView.Object,
+                FileStoreMock.MockFactory(fileStore).Object,
+                FileHasherMock.Mock().Object,
+                fileService.Object);
+
+            await client.RunAsync();
+
+            // Verify ITextView
+            var filesOnClient = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
+                }
+            };
+
+            var filesOnService = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
+                    Sha1 = "1234",
+                    LastWriteTimeUtc = DateTime.UtcNow,
+                }
+            };
+
+            var conflicts = new[]
+            {
+                new Conflict(
+                    clientFile: filesOnClient[0],
+                    serviceFile: filesOnService[0])
+            };
+
+            VerifyTextView(
+                textView,
+                filesOnClient: filesOnClient,
+                filesOnService: filesOnService,
+                filesToUpload: Enumerable.Empty<FileSyncFile>(),
+                filesToDownload: filesOnService,
+                conflicts: conflicts);
 
             // Verify IFileStore
             fileStore.Verify(
@@ -199,61 +307,6 @@ namespace FileSync.Client.Tests
 
             fileStore.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
-                Times.Never);
-
-            fileStore.Verify(
-                x => x.ReadFileAsync(It.IsAny<string>()),
-                Times.Never);
-
-            fileStore.VerifyNoOtherCalls();
-
-            // Verify IFileServiceApi
-            fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
-                Times.Once);
-
-            fileService.Verify(
-                x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
-                Times.Never);
-
-            fileService.VerifyNoOtherCalls();
-        }
-
-        [Fact]
-        public async Task SameFilesSameVersionsOnClientAndService()
-        {
-            var textView = new Mock<ITextView>();
-
-            var fileStore = FileStoreMock.Mock(
-                Enumerable.Empty<DirectoryInfo>(),
-                Enumerable.Empty<FileInfo>());
-
-            var fileService = new Mock<IFileServiceApi>();
-
-            var client = new SyncClient(
-                textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
-                FileHasherMock.Mock().Object,
-                fileService.Object);
-
-            await client.RunAsync();
-
-            // Verify ITextView
-            //VerifyTextView(
-            //    textView,
-            //    filesOnClient: filesOnClient,
-            //    filesOnService: filesOnService,
-            //    filesToUpload: filesOnClient,
-            //    filesToDownload: filesOnService,
-            //    conflicts: Enumerable.Empty<Conflict>());
-
-            // Verify IFileStore
-            fileStore.Verify(
-                x => x.GetFiles(),
-                Times.Once);
-
-            fileStore.Verify(
-                x => x.GetDirectories(),
                 Times.Once);
 
             fileStore.VerifyNoOtherCalls();
@@ -261,6 +314,10 @@ namespace FileSync.Client.Tests
             // Verify IFileServiceApi
             fileService.Verify(
                 x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                Times.Once);
+
+            fileService.Verify(
+                x => x.GetFileContentAsync(It.IsAny<FileSyncFile>()),
                 Times.Once);
 
             fileService.VerifyNoOtherCalls();
@@ -276,7 +333,7 @@ namespace FileSync.Client.Tests
             return fileService;
         }
 
-        // Provide a way to check that the ITextView received the correct output
+        // Moq won't let you pass an IEqualityComparer, just a Func
         private static TValue ItIsEqual<TValue>(TValue value, IEqualityComparer<TValue> equalityComparer)
             => It.Is<TValue>(
                 x => equalityComparer.Equals(x, value));
