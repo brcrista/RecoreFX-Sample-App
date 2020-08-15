@@ -33,7 +33,7 @@ namespace FileSync.Client.Tests
                 Enumerable.Empty<DirectoryInfo>(),
                 Enumerable.Empty<FileInfo>());
 
-            var fileService = new Mock<IFileServiceHttpClient>();
+            var fileService = new Mock<IFileServiceApi>();
 
             var client = new SyncClient(
                 textView.Object,
@@ -78,7 +78,7 @@ namespace FileSync.Client.Tests
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Never);
 
-            // Verify IFileServiceHttpClient
+            // Verify IFileServiceApi
             fileService.Verify(
                 x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
                 Times.Once);

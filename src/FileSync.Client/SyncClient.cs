@@ -19,13 +19,13 @@ namespace FileSync.Client
         private readonly ITextView view;
         private readonly IFileStoreFactory fileStoreFactory;
         private readonly IFileHasher fileHasher;
-        private readonly IFileServiceHttpClient fileService;
+        private readonly IFileServiceApi fileService;
 
         public SyncClient(
             ITextView view,
             IFileStoreFactory fileStoreFactory,
             IFileHasher fileHasher,
-            IFileServiceHttpClient fileService)
+            IFileServiceApi fileService)
         {
             this.view = view;
             this.fileStoreFactory = fileStoreFactory;

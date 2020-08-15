@@ -7,7 +7,7 @@ using FileSync.Common.ApiModels;
 
 namespace FileSync.Client
 {
-    interface IFileServiceHttpClient
+    interface IFileServiceApi
     {
         Task<IEnumerable<Either<FileSyncDirectory, FileSyncFile>>> GetDirectoryListingAsync(Optional<RelativeUri> listingUri);
 
