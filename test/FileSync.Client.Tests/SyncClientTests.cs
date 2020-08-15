@@ -57,24 +57,12 @@ namespace FileSync.Client.Tests
                 x => x.GetDirectories(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
-                Times.Never);
-
-            fileStore.Verify(
-                x => x.ReadFileAsync(It.IsAny<string>()),
-                Times.Never);
-
             fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
                 x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
                 Times.Once);
-
-            fileService.Verify(
-                x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
-                Times.Never);
 
             fileService.VerifyNoOtherCalls();
         }
@@ -268,24 +256,12 @@ namespace FileSync.Client.Tests
                 x => x.GetDirectories(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
-                Times.Never);
-
-            fileStore.Verify(
-                x => x.ReadFileAsync(It.IsAny<string>()),
-                Times.Never);
-
             fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
                 x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
                 Times.Once);
-
-            fileService.Verify(
-                x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
-                Times.Never);
 
             fileService.VerifyNoOtherCalls();
         }
