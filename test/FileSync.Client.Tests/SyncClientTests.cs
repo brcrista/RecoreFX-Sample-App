@@ -20,9 +20,14 @@ namespace FileSync.Client.Tests
 
     public class SyncClientTests
     {
+        // Provide a way to check that the ITextView received the correct output
         private static readonly IEqualityComparer<ITextViewComponent> textViewComponentEqualityComparer = new AnonymousEqualityComparer<ITextViewComponent>(
             (lhs, rhs) => Enumerable.SequenceEqual(lhs.GetLines(), rhs.GetLines()),
             _ => 0);
+
+        private static TValue ItIsEqual<TValue>(TValue value, IEqualityComparer<TValue> equalityComparer)
+            => It.Is<TValue>(
+                x => equalityComparer.Equals(x, value));
 
         [Fact]
         public async Task NoFilesOnClientOrService()
@@ -45,28 +50,26 @@ namespace FileSync.Client.Tests
 
             // Verify ITextView
             ITextViewComponent expectedTextViewComponent;
-            expectedTextViewComponent = new FileListViewComponent("Files on the client:", Enumerable.Empty<FileSyncFile>());
+            var noFiles = Enumerable.Empty<FileSyncFile>();
+
+            expectedTextViewComponent = new FileListViewComponent("Files on the client:", noFiles);
             textView.Verify(
-                x => x.Verbose(It.Is<ITextViewComponent>(
-                    x => textViewComponentEqualityComparer.Equals(x, expectedTextViewComponent))),
+                x => x.Verbose(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
                 Times.Once());
 
-            expectedTextViewComponent = new FileListViewComponent("Files on the service:", Enumerable.Empty<FileSyncFile>());
+            expectedTextViewComponent = new FileListViewComponent("Files on the service:", noFiles);
             textView.Verify(
-                x => x.Verbose(It.Is<ITextViewComponent>(
-                    x => textViewComponentEqualityComparer.Equals(x, expectedTextViewComponent))),
+                x => x.Verbose(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
                 Times.Once());
 
-            expectedTextViewComponent = new FileListViewComponent("Files to download:", Enumerable.Empty<FileSyncFile>());
+            expectedTextViewComponent = new FileListViewComponent("Files to download:", noFiles);
             textView.Verify(
-                x => x.Verbose(It.Is<ITextViewComponent>(
-                    x => textViewComponentEqualityComparer.Equals(x, expectedTextViewComponent))),
+                x => x.Verbose(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
                 Times.Once());
 
-            expectedTextViewComponent = new FileListViewComponent("Files to upload:", Enumerable.Empty<FileSyncFile>());
+            expectedTextViewComponent = new FileListViewComponent("Files to upload:", noFiles);
             textView.Verify(
-                x => x.Verbose(It.Is<ITextViewComponent>(
-                    x => textViewComponentEqualityComparer.Equals(x, expectedTextViewComponent))),
+                x => x.Verbose(ItIsEqual(expectedTextViewComponent, textViewComponentEqualityComparer)),
                 Times.Once());
 
             // Verify IFileStore
