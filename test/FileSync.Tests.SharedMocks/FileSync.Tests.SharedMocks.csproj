@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.14.5" />
-    <ProjectReference Include="..\..\..\RecoreFX\src\Recore.csproj" />
+    <PackageReference Include="RecoreFX" Version="0.9.0" />
   </ItemGroup>
 
   <ItemGroup>
