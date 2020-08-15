@@ -52,10 +52,8 @@ namespace FileSync.Client
             var filesToUpload = compareFiles.FilesToUpload().ToList();
             view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
 
-            var uploadFailures = new LinkedList<FileSyncFile>();
-            foreach (var file in filesToUpload)
-            {
-                try
+            var uploadResults = await Task.WhenAll(filesToUpload.Select(file =>
+                Result.Try(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
@@ -64,22 +62,21 @@ namespace FileSync.Client
                     var content = await fileStore.ReadFileAsync(basename);
 
                     await fileService.PutFileContentAsync(file.RelativePath, content);
-                }
-                catch (HttpRequestException e)
+                    return file;
+                })
+                .Catch((HttpRequestException e) =>
                 {
                     view.Error(new LineViewComponent($"Error uploading file {file.RelativePath}. {e.Message}"));
-                    uploadFailures.AddLast(file);
-                }
-            }
+                    return Task.FromResult(file);
+                })
+                .Await()));
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
             view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
 
-            var downloadFailures = new LinkedList<FileSyncFile>();
-            foreach (var file in filesToDownload)
-            {
-                try
+            var downloadResults = await Task.WhenAll(filesToDownload.Select(file =>
+                Result.Try(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
@@ -88,26 +85,31 @@ namespace FileSync.Client
                     var content = await fileService.GetFileContentAsync(file);
 
                     await fileStore.WriteFileAsync(basename, content);
-                }
-                catch (HttpRequestException e)
+                    return file;
+                })
+                .Catch((HttpRequestException e) =>
                 {
                     view.Error(new LineViewComponent($"Error downloading file {file.RelativePath}. {e.Message}"));
-                    downloadFailures.AddLast(file);
-                }
-            }
+                    return Task.FromResult(file);
+                })
+                .Await()));
 
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
-            var sentFiles = filesToUpload
-                .Except(uploadFailures, compareOnFilepath)
+
+            var sentFiles = uploadResults
+                .Successes()
                 .ToList();
 
-            var newFiles = filesToDownload
+            var downloadedFiles = downloadResults
+                .Successes()
+                .ToList();
+
+            var newFiles = downloadedFiles
                 .Except(filesOnClient, compareOnFilepath)
-                .Except(downloadFailures, compareOnFilepath)
                 .ToList();
 
-            var changedFiles = filesToDownload
+            var changedFiles = downloadedFiles
                 .Intersect(filesOnClient, compareOnFilepath)
                 .ToList();
 
@@ -116,14 +118,14 @@ namespace FileSync.Client
                 newFiles: newFiles,
                 changedFiles: changedFiles));
 
-            if (uploadFailures.Any())
+            if (uploadResults.Failures().Any())
             {
-                view.Error(new FileListViewComponent("Failed to upload some files:", uploadFailures));
+                view.Error(new FileListViewComponent("Failed to upload some files:", uploadResults.Failures()));
             }
 
-            if (downloadFailures.Any())
+            if (downloadResults.Failures().Any())
             {
-                view.Error(new FileListViewComponent("Failed to download some files:", downloadFailures));
+                view.Error(new FileListViewComponent("Failed to download some files:", downloadResults.Failures()));
             }
         }
 
