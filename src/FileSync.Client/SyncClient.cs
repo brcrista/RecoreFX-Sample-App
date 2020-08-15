@@ -47,21 +47,6 @@ namespace FileSync.Client
             var compareFiles = new CompareFiles(filesOnClient, filesOnService, fileHasher);
             view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
 
-            // Download file content from the service
-            var filesToDownload = compareFiles.FilesToDownload().ToList();
-            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
-
-            foreach (var file in filesToDownload)
-            {
-                var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-                var basename = Path.GetFileName(file.RelativePath);
-                var content = await fileService.GetFileContentAsync(file);
-
-                await fileStore.WriteFileAsync(basename, content);
-            }
-
             // Upload files to the service
             var filesToUpload = compareFiles.FilesToUpload().ToList();
             view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
@@ -75,6 +60,21 @@ namespace FileSync.Client
                 var content = await fileStore.ReadFileAsync(basename);
 
                 await fileService.PutFileContentAsync(file.RelativePath, content);
+            }
+
+            // Download file content from the service
+            var filesToDownload = compareFiles.FilesToDownload().ToList();
+            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
+
+            foreach (var file in filesToDownload)
+            {
+                var dirname = Path.GetDirectoryName(file.RelativePath);
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+
+                var basename = Path.GetFileName(file.RelativePath);
+                var content = await fileService.GetFileContentAsync(file);
+
+                await fileStore.WriteFileAsync(basename, content);
             }
 
             // Print summary
