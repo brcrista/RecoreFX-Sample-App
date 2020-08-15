@@ -4,7 +4,7 @@ rm -rf client service
 
 mkdir client && cd client
 echo "client-only file" > client-only.txt
-echo "shared file" > shared-file.txt
+echo "shared file client" > shared-file.txt
 
 mkdir shared-dir
 echo "shared file" > shared-dir/shared-file.txt
@@ -12,9 +12,12 @@ cd ..
 
 mkdir service && cd service
 echo "service-only file" > service-only.txt
-echo "shared file" > shared-file.txt
+echo "shared file service" > shared-file.txt
 
 mkdir service-only-dir shared-dir
 echo "service-only file" > service-only-dir/service-only.txt
 echo "service-only file" > shared-dir/service-only.txt
 echo "shared file" > shared-dir/shared-file.txt
+
+mkdir service-only-dir/subdir
+echo "service-only file" > service-only-dir/subdir/service-only.txt
