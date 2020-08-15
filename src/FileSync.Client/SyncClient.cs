@@ -67,7 +67,7 @@ namespace FileSync.Client
                 }
                 catch (HttpRequestException e)
                 {
-                    view.Error(new LineViewComponent($"Error uploading file {file.RelativePath}: {e.Message}"));
+                    view.Error(new LineViewComponent($"Error uploading file {file.RelativePath}. {e.Message}"));
                     uploadFailures.AddLast(file);
                 }
             }
@@ -91,7 +91,7 @@ namespace FileSync.Client
                 }
                 catch (HttpRequestException e)
                 {
-                    view.Error(new LineViewComponent($"Error downloading file {file.RelativePath}: {e.Message}"));
+                    view.Error(new LineViewComponent($"Error downloading file {file.RelativePath}. {e.Message}"));
                     downloadFailures.AddLast(file);
                 }
             }

@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +24,7 @@ namespace FileSync.Service
             var forwardSlashPath = new ForwardSlashFilepath(path);
             var systemPath = forwardSlashPath.ToFilepath();
 
-            if (!Directory.Exists(systemPath))
+            if (!System.IO.File.Exists(systemPath))
             {
                 return NotFound();
             }
