@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/FileSync.Client/FileSync.Client.csproj" />
     <ProjectReference Include="../../src/FileSync.Common/FileSync.Common.csproj" />
+    <ProjectReference Include="../FileSync.Tests.SharedMocks/FileSync.Tests.SharedMocks.csproj" />
   </ItemGroup>
 
 </Project>
