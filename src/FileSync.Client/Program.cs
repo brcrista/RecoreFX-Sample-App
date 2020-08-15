@@ -12,7 +12,7 @@ namespace FileSync.Client
 {
     static class Program
     {
-        private static void ConfigureServices(IServiceCollection services)
+        static void ConfigureServices(IServiceCollection services)
         {
             var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
 
