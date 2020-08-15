@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using FileSync.Common.ApiModels;
 
@@ -9,15 +10,19 @@ namespace FileSync.Client.UI
         private readonly IReadOnlyList<FileListViewComponent> fileListViews;
 
         public SummaryViewComponent(
-            IReadOnlyList<FileSyncFile> sentFiles,
-            IReadOnlyList<FileSyncFile> newFiles,
-            IReadOnlyList<FileSyncFile> changedFiles)
+            IEnumerable<FileSyncFile> sentFiles,
+            IEnumerable<FileSyncFile> newFiles,
+            IEnumerable<FileSyncFile> changedFiles)
         {
+            var sentFilesList = sentFiles.ToList();
+            var newFilesList = newFiles.ToList();
+            var changedFilesList = changedFiles.ToList();
+
             fileListViews = new[]
             {
-                new FileListViewComponent($"Sent files: {sentFiles.Count}", sentFiles),
-                new FileListViewComponent($"New files: {newFiles.Count}", newFiles),
-                new FileListViewComponent($"Changed files: {changedFiles.Count}", changedFiles)
+                new FileListViewComponent($"Sent files: {sentFilesList.Count}", sentFilesList),
+                new FileListViewComponent($"New files: {newFilesList.Count}", newFilesList),
+                new FileListViewComponent($"Changed files: {changedFilesList.Count}", changedFilesList)
             };
         }
 

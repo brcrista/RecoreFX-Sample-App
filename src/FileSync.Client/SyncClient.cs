@@ -94,27 +94,14 @@ namespace FileSync.Client
 
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
-
-            var sentFiles = uploadResults
-                .Successes()
-                .ToList();
-
             var downloadedFiles = downloadResults
                 .Successes()
                 .ToList();
 
-            var newFiles = downloadedFiles
-                .Except(filesOnClient, compareOnFilepath)
-                .ToList();
-
-            var changedFiles = downloadedFiles
-                .Intersect(filesOnClient, compareOnFilepath)
-                .ToList();
-
             view.Out(new SummaryViewComponent(
-                sentFiles: sentFiles,
-                newFiles: newFiles,
-                changedFiles: changedFiles));
+                sentFiles: uploadResults.Successes(),
+                newFiles: downloadedFiles.Except(filesOnClient, compareOnFilepath),
+                changedFiles: downloadedFiles.Intersect(filesOnClient, compareOnFilepath)));
 
             if (uploadResults.Failures().Any())
             {
