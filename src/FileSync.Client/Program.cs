@@ -16,8 +16,6 @@ namespace FileSync.Client
         {
             var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
 
-            // Use a single HTTP client for connection pooling
-            // (not that it really matters in this application)
             var httpClient = new HttpClient
             {
                 BaseAddress = new AbsoluteUri("http://localhost:5000/")
@@ -27,25 +25,20 @@ namespace FileSync.Client
                 .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddSingleton<ITextView>(new ConsoleView { IsVerbose = true })
-                .AddSingleton<IFileServiceApi>(new FileServiceHttpClient(httpClient))
+                .AddSingleton(httpClient)
+                .AddSingleton<IFileServiceApi, FileServiceHttpClient>()
                 .AddSingleton<SyncClient>();
-        }
-
-        private static ServiceProvider BuildServiceProvider()
-        {
-            var services = new ServiceCollection();
-            ConfigureServices(services);
-
-            return services.BuildServiceProvider();
         }
 
         static async Task<int> Main()
         {
             try
             {
-                var serviceProvider = BuildServiceProvider();
-
-                var syncClient = serviceProvider.GetService<SyncClient>();
+                var syncClient = Pipeline.Of(new ServiceCollection())
+                    .Then(ConfigureServices)
+                    .Then(x => x.BuildServiceProvider())
+                    .Then(x => x.GetService<SyncClient>())
+                    .Result;
 
                 await syncClient.RunAsync();
                 return 0;
