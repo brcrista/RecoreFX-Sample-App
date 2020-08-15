@@ -18,6 +18,7 @@ namespace FileSync.Service
                 .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddSingleton<IDirectoryListingService, DirectoryListingService>()
+                .AddSingleton<IFileContentService, FileContentService>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }
