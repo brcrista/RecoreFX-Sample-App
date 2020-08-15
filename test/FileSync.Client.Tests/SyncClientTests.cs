@@ -50,12 +50,22 @@ namespace FileSync.Client.Tests
 
             // Verify IFileStore
             fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Never);
 
             fileStore.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Never);
+
+            fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -65,6 +75,8 @@ namespace FileSync.Client.Tests
             fileService.Verify(
                 x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
                 Times.Never);
+
+            fileService.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -127,12 +139,22 @@ namespace FileSync.Client.Tests
 
             // Verify IFileStore
             fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Once);
 
             fileStore.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Exactly(2));
+
+            fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -142,6 +164,12 @@ namespace FileSync.Client.Tests
             fileService.Verify(
                 x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
                 Times.Exactly(2));
+
+            fileService.Verify(
+                x => x.GetFileContentAsync(It.IsAny<FileSyncFile>()),
+                Times.Once);
+
+            fileService.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -174,12 +202,22 @@ namespace FileSync.Client.Tests
 
             // Verify IFileStore
             fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Never);
 
             fileStore.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Never);
+
+            fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -189,6 +227,8 @@ namespace FileSync.Client.Tests
             fileService.Verify(
                 x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
                 Times.Never);
+
+            fileService.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -221,12 +261,22 @@ namespace FileSync.Client.Tests
 
             // Verify IFileStore
             fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Never);
 
             fileStore.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Never);
+
+            fileStore.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -236,6 +286,8 @@ namespace FileSync.Client.Tests
             fileService.Verify(
                 x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
                 Times.Never);
+
+            fileService.VerifyNoOtherCalls();
         }
 
         private static Mock<IFileServiceApi> MockFileServiceApi(IEnumerable<DirectoryListing> directoryListing)
