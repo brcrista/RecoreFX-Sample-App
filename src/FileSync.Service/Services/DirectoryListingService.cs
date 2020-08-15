@@ -25,7 +25,7 @@ namespace FileSync.Service
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
                     parentDirectory: systemPath,
-                    listingEndpoint: new RelativeUri("api/v1/listing"));
+                    listingEndpoint: Endpoints.Listing);
             }
 
             foreach (var fileInfo in fileStore.GetFiles())
@@ -34,7 +34,7 @@ namespace FileSync.Service
                     fileInfo,
                     parentDirectory: systemPath,
                     Optional.Of(fileHasher),
-                    contentEndpoint: new RelativeUri("api/v1/content"));
+                    contentEndpoint: Endpoints.Content);
             }
         }
     }
