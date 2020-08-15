@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Moq;
 using Recore;
@@ -315,6 +316,108 @@ namespace FileSync.Client.Tests
             fileService.Verify(
                 x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
                 Times.Once);
+
+            fileService.Verify(
+                x => x.GetFileContentAsync(It.IsAny<FileSyncFile>()),
+                Times.Once);
+
+            fileService.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task ContinuesOnFailedDownload()
+        {
+            var textView = new Mock<ITextView>();
+
+            var fileStore = FileStoreMock.Mock(
+                Enumerable.Empty<DirectoryInfo>(),
+                new[]
+                {
+                    new FileInfo("client-only-file-1.txt"),
+                    new FileInfo("client-only-file-2.txt")
+                });
+
+            var fileService = MockFileServiceApi(new DirectoryListing[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
+                }
+            });
+
+            fileService
+                .Setup(x => x.GetFileContentAsync(It.Is<FileSyncFile>(
+                    file => file.RelativePath == "./service-only-file-1.txt")))
+                .Throws<HttpRequestException>();
+
+            var client = new SyncClient(
+                textView.Object,
+                FileStoreMock.MockFactory(fileStore).Object,
+                FileHasherMock.Mock().Object,
+                fileService.Object);
+
+            await client.RunAsync();
+
+            // Verify ITextView
+            var filesOnClient = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./client-only-file-1.txt")
+                },
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./client-only-file-2.txt")
+                }
+            };
+
+            var filesOnService = new[]
+            {
+                new FileSyncFile
+                {
+                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
+                }
+            };
+
+            textView.Verify(
+                x => x.Error(It.IsAny<LineViewComponent>()),
+                Times.Once());
+
+            textView.Verify(
+                x => x.Error(It.IsAny<FileListViewComponent>()),
+                Times.Once());
+
+            VerifyTextView(
+                textView,
+                filesOnClient: filesOnClient,
+                filesOnService: filesOnService,
+                filesToUpload: filesOnClient,
+                filesToDownload: filesOnService,
+                conflicts: Enumerable.Empty<Conflict>());
+
+            // Verify IFileStore
+            fileStore.Verify(
+                x => x.GetFiles(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.GetDirectories(),
+                Times.Once);
+
+            fileStore.Verify(
+                x => x.ReadFileAsync(It.IsAny<string>()),
+                Times.Exactly(2));
+
+            fileStore.VerifyNoOtherCalls();
+
+            // Verify IFileServiceApi
+            fileService.Verify(
+                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                Times.Once);
+
+            fileService.Verify(
+                x => x.PutFileContentAsync(It.IsAny<ForwardSlashFilepath>(), It.IsAny<Stream>()),
+                Times.Exactly(2));
 
             fileService.Verify(
                 x => x.GetFileContentAsync(It.IsAny<FileSyncFile>()),

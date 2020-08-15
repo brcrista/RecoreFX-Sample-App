@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Recore;
 using Recore.Collections.Generic;
@@ -51,38 +52,79 @@ namespace FileSync.Client
             var filesToUpload = compareFiles.FilesToUpload().ToList();
             view.Verbose(new FileListViewComponent("Files to upload:", filesToUpload));
 
+            var uploadFailures = new LinkedList<FileSyncFile>();
             foreach (var file in filesToUpload)
             {
-                var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+                try
+                {
+                    var dirname = Path.GetDirectoryName(file.RelativePath);
+                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-                var basename = Path.GetFileName(file.RelativePath);
-                var content = await fileStore.ReadFileAsync(basename);
+                    var basename = Path.GetFileName(file.RelativePath);
+                    var content = await fileStore.ReadFileAsync(basename);
 
-                await fileService.PutFileContentAsync(file.RelativePath, content);
+                    await fileService.PutFileContentAsync(file.RelativePath, content);
+                }
+                catch (HttpRequestException e)
+                {
+                    view.Error(new LineViewComponent($"Error uploading file {file.RelativePath}. {e.Message}"));
+                    uploadFailures.AddLast(file);
+                }
             }
 
             // Download file content from the service
             var filesToDownload = compareFiles.FilesToDownload().ToList();
             view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
 
+            var downloadFailures = new LinkedList<FileSyncFile>();
             foreach (var file in filesToDownload)
             {
-                var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+                try
+                {
+                    var dirname = Path.GetDirectoryName(file.RelativePath);
+                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-                var basename = Path.GetFileName(file.RelativePath);
-                var content = await fileService.GetFileContentAsync(file);
+                    var basename = Path.GetFileName(file.RelativePath);
+                    var content = await fileService.GetFileContentAsync(file);
 
-                await fileStore.WriteFileAsync(basename, content);
+                    await fileStore.WriteFileAsync(basename, content);
+                }
+                catch (HttpRequestException e)
+                {
+                    view.Error(new LineViewComponent($"Error downloading file {file.RelativePath}. {e.Message}"));
+                    downloadFailures.AddLast(file);
+                }
             }
 
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
+            var sentFiles = filesToUpload
+                .Except(uploadFailures, compareOnFilepath)
+                .ToList();
+
+            var newFiles = filesToDownload
+                .Except(filesOnClient, compareOnFilepath)
+                .Except(downloadFailures, compareOnFilepath)
+                .ToList();
+
+            var changedFiles = filesToDownload
+                .Intersect(filesOnClient, compareOnFilepath)
+                .ToList();
+
             view.Out(new SummaryViewComponent(
-                sentFiles: filesToUpload,
-                newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
-                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList()));
+                sentFiles: sentFiles,
+                newFiles: newFiles,
+                changedFiles: changedFiles));
+
+            if (uploadFailures.Any())
+            {
+                view.Error(new FileListViewComponent("Failed to upload some files:", uploadFailures));
+            }
+
+            if (downloadFailures.Any())
+            {
+                view.Error(new FileListViewComponent("Failed to download some files:", downloadFailures));
+            }
         }
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)

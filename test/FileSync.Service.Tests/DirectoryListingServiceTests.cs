@@ -3,15 +3,15 @@ using System.Linq;
 using Recore;
 using Xunit;
 
+using FileSync.Common;
 using FileSync.Common.ApiModels;
-using FileSync.Service.Controllers;
 using FileSync.Tests.SharedMocks;
 
 namespace FileSync.Service.Tests
 {
     using DirectoryListing = Either<FileSyncDirectory, FileSyncFile>;
 
-    public class DirectoryControllerTests
+    public class DirectoryListingServiceTests
     {
         [Fact]
         public void GetListingRootDirectory()
@@ -27,11 +27,11 @@ namespace FileSync.Service.Tests
                     new FileInfo("world.txt")
                 });
 
-            var controller = new DirectoryV1Controller(
+            var listingService = new DirectoryListingService(
                 FileStoreMock.MockFactory(fileStore).Object,
                 FileHasherMock.Mock().Object);
 
-            var actual = controller.GetListing().ToArray();
+            var actual = listingService.GetListing(new SystemFilepath(".")).ToArray();
 
             var expected = new DirectoryListing[]
             {
@@ -73,11 +73,11 @@ namespace FileSync.Service.Tests
                     new FileInfo("world.txt")
                 });
 
-            var controller = new DirectoryV1Controller(
+            var listingService = new DirectoryListingService(
                 FileStoreMock.MockFactory(fileStore).Object,
                 FileHasherMock.Mock().Object);
 
-            var actual = controller.GetListing("./subdirectory").ToArray();
+            var actual = listingService.GetListing(new SystemFilepath("./subdirectory")).ToArray();
 
             var expected = new DirectoryListing[]
             {
@@ -112,11 +112,11 @@ namespace FileSync.Service.Tests
                 Enumerable.Empty<DirectoryInfo>(),
                 Enumerable.Empty<FileInfo>());
 
-            var controller = new DirectoryV1Controller(
+            var listingService = new DirectoryListingService(
                 FileStoreMock.MockFactory(fileStore).Object,
                 FileHasherMock.Mock().Object);
 
-            var actual = controller.GetListing("./empty-directory");
+            var actual = listingService.GetListing(new SystemFilepath("./empty-directory"));
             var expected = Enumerable.Empty<DirectoryListing>();
 
             Assert.Equal(expected, actual);
