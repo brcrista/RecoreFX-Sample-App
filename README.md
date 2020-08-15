@@ -2,7 +2,18 @@
 
 [![CI](https://github.com/brcrista/RecoreFX-Sample-App/workflows/CI/badge.svg)](https://github.com/recorefx/RecoreFX-Sample-App/actions?query=workflow%3ACI)
 
-## Running the app
+This sample app is to test and demo the features of [RecoreFX](https://github.com/recorefx/RecoreFX).
+
+## How it works
+
+The app syncs files between two file system subtrees.
+* The [service](src/FileSync.Service/) runs in one subtree and the [client](src/FileSync.Client/) runs on the other.
+* The client and the service communicate over HTTP.
+* Every time you run the client, it will push any files that the service doesn't have, then pull any files that it is missing, then exit.
+* If the client and service both have files with the same path but different contents (determined by the file hashes), the client will choose the file with the latest modified time.
+* Deleting files through syncing is not supported. If a file is deleted on the client, it will get pulled again from the service on the next run. Likewise, if a file is deleted on the service, any clients that have it will push it the next time they run.
+
+### Running the app
 
 Both the client and service simply look at your current working directory. You can run them with
 
@@ -12,17 +23,6 @@ dotnet path/to/FileSync.Client.dll
 ```
 
 See the [app-playground](./app-playground) directory for a working example.
-
-## How it works
-
-This sample app is to test and demo the features of [RecoreFX](https://github.com/recorefx/RecoreFX).
-
-The app syncs files between two file system subtrees.
-* The [service](src/FileSync.Service/) runs in one subtree and the [client](src/FileSync.Client/) runs on the other.
-* The client and the service communicate over HTTP.
-* Every time the client runs, it will pull any files that it is missing, then push any files that the service doesn't have, and then exit.
-* If the client and service both have files with the same name but different contents (determined by the file hashes), the client will choose the file with the latest modified time.
-* Deleting files through syncing is not supported. If a file is deleted on the client, it will get pulled again from the service on the next run. Likewise, if a file is deleted on the service, any clients that have it will push it the next time they run.
 
 When the client runs, it will produce output like
 
