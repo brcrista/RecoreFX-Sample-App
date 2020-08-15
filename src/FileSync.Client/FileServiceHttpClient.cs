@@ -13,7 +13,7 @@ namespace FileSync.Client
 {
     using DirectoryListing = Either<FileSyncDirectory, FileSyncFile>;
 
-    sealed class FileServiceHttpClient : IFileServiceHttpClient
+    sealed class FileServiceHttpClient : IFileServiceApi
     {
         private readonly HttpClient httpClient;
         private readonly JsonSerializerOptions jsonOptions;

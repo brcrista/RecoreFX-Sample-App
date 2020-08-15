@@ -19,7 +19,7 @@ namespace FileSync.Client
 
                 // Use a single HTTP client for connection pooling
                 // (not that it really matters in this application)
-                var httpClient = new HttpClient
+                using var httpClient = new HttpClient
                 {
                     BaseAddress = new AbsoluteUri("http://localhost:5000/")
                 };

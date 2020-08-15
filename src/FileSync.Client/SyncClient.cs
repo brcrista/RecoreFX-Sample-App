@@ -19,13 +19,13 @@ namespace FileSync.Client
         private readonly ITextView view;
         private readonly IFileStoreFactory fileStoreFactory;
         private readonly IFileHasher fileHasher;
-        private readonly IFileServiceHttpClient fileService;
+        private readonly IFileServiceApi fileService;
 
         public SyncClient(
             ITextView view,
             IFileStoreFactory fileStoreFactory,
             IFileHasher fileHasher,
-            IFileServiceHttpClient fileService)
+            IFileServiceApi fileService)
         {
             this.view = view;
             this.fileStoreFactory = fileStoreFactory;
@@ -37,32 +37,15 @@ namespace FileSync.Client
         {
             // Get the files on the client
             var filesOnClient = GetAllFilesOnClient(new SystemFilepath(".")).ToList();
-
             view.Verbose(new FileListViewComponent("Files on the client:", filesOnClient));
 
             // Call the service to get the files on it
             var filesOnService = (await GetAllFilesOnService()).ToList();
             view.Verbose(new FileListViewComponent("Files on the service:", filesOnService));
 
+            // Find and resolve conflicts
             var compareFiles = new CompareFiles(filesOnClient, filesOnService, fileHasher);
-
-            // Print a message for conflicts
             view.Out(new ConflictsViewComponent(compareFiles.Conflicts()));
-
-            // Download file content from the service
-            var filesToDownload = compareFiles.FilesToDownload().ToList();
-            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
-
-            foreach (var file in filesToDownload)
-            {
-                var dirname = Path.GetDirectoryName(file.RelativePath);
-                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-                var basename = Path.GetFileName(file.RelativePath);
-                var content = await fileService.GetFileContentAsync(file);
-
-                await fileStore.WriteFileAsync(basename, content);
-            }
 
             // Upload files to the service
             var filesToUpload = compareFiles.FilesToUpload().ToList();
@@ -79,13 +62,27 @@ namespace FileSync.Client
                 await fileService.PutFileContentAsync(file.RelativePath, content);
             }
 
+            // Download file content from the service
+            var filesToDownload = compareFiles.FilesToDownload().ToList();
+            view.Verbose(new FileListViewComponent("Files to download:", filesToDownload));
+
+            foreach (var file in filesToDownload)
+            {
+                var dirname = Path.GetDirectoryName(file.RelativePath);
+                var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+
+                var basename = Path.GetFileName(file.RelativePath);
+                var content = await fileService.GetFileContentAsync(file);
+
+                await fileStore.WriteFileAsync(basename, content);
+            }
+
             // Print summary
             var compareOnFilepath = new MappedEqualityComparer<FileSyncFile, ForwardSlashFilepath>(x => x.RelativePath);
-
             view.Out(new SummaryViewComponent(
+                sentFiles: filesToUpload,
                 newFiles: filesToDownload.Except(filesOnClient, compareOnFilepath).ToList(),
-                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList(),
-                sentFiles: filesToUpload));
+                changedFiles: filesToDownload.Intersect(filesOnClient, compareOnFilepath).ToList()));
         }
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
