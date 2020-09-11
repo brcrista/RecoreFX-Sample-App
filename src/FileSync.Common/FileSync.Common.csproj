@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RecoreFX" Version="0.10.0" />
+    <PackageReference Include="RecoreFX" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
