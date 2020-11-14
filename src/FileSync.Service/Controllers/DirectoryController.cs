@@ -1,7 +1,7 @@
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 
-using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {

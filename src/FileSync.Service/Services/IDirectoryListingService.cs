@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Recore;
 
-using FileSync.Common;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {

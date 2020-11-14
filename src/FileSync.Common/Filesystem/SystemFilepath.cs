@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace FileSync.Common
+namespace FileSync.Common.Filesystem
 {
     /// <summary>
     /// A filepath that uses the current platform's directory separator.

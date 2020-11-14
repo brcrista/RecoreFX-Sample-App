@@ -2,6 +2,8 @@
 using System.IO;
 using Recore;
 
+using FileSync.Common.Filesystem;
+
 namespace FileSync.Common.ApiModels
 {
     public sealed record FileSyncFile

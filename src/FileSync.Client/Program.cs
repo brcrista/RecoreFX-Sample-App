@@ -7,6 +7,7 @@ using Recore;
 
 using FileSync.Client.UI;
 using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {

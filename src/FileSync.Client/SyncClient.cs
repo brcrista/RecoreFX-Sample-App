@@ -8,6 +8,7 @@ using Recore.Collections.Generic;
 using FileSync.Client.UI;
 using FileSync.Common;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {

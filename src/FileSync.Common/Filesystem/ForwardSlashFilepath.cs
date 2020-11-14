@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace FileSync.Common.ApiModels
+namespace FileSync.Common.Filesystem
 {
     /// <summary>
     /// A filepath that uses the <c>/</c> character as a separator.

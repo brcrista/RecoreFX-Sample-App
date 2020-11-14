@@ -9,6 +9,7 @@ using Recore;
 using Recore.Text.Json.Serialization.Converters;
 
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileSync.Common
+namespace FileSync.Common.Filesystem
 {
     public class NoParentDirectoryException : Exception
     {

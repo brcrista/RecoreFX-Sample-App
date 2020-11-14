@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace FileSync.Common
+namespace FileSync.Common.Filesystem
 {
     public interface IDirectory
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Moq;
 
-using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Tests.SharedMocks
 {

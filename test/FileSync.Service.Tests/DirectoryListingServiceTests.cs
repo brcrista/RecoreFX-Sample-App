@@ -3,8 +3,8 @@ using System.Linq;
 using Recore;
 using Xunit;
 
-using FileSync.Common;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 using FileSync.Tests.SharedMocks;
 
 namespace FileSync.Service.Tests

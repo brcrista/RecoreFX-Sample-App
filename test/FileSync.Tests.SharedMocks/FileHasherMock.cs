@@ -3,6 +3,7 @@ using Moq;
 using Recore.Security.Cryptography;
 
 using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Tests.SharedMocks
 {

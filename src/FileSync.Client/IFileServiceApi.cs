@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Recore;
 
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {

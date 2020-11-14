@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FileSync.Common
+namespace FileSync.Common.Filesystem
 {
     /// <summary>
     /// A directory on the local file system.

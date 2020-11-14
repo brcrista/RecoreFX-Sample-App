@@ -3,6 +3,8 @@ using System.IO;
 using System.Security.Cryptography;
 using Recore.Security.Cryptography;
 
+using FileSync.Common.Filesystem;
+
 namespace FileSync.Common
 {
     public sealed class FileHasher : IFileHasher

@@ -11,6 +11,7 @@ using Xunit;
 
 using FileSync.Client.UI;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 using FileSync.Tests.SharedMocks;
 
 namespace FileSync.Client.Tests

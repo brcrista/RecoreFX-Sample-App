@@ -1,4 +1,4 @@
-﻿namespace FileSync.Common
+﻿namespace FileSync.Common.Filesystem
 {
     public sealed class DirectoryFactory : IDirectoryFactory
     {

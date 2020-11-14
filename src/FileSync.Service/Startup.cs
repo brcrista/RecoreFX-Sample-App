@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {
