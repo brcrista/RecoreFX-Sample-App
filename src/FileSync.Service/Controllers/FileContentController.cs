@@ -22,7 +22,7 @@ namespace FileSync.Service
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
-            var systemPath = forwardSlashPath.ToFilepath();
+            var systemPath = forwardSlashPath.ToSystemFilepath();
 
             if (!System.IO.File.Exists(systemPath.ToString()))
             {
@@ -38,7 +38,7 @@ namespace FileSync.Service
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
-            var systemPath = forwardSlashPath.ToFilepath();
+            var systemPath = forwardSlashPath.ToSystemFilepath();
 
             if (!Request.Body.CanRead)
             {

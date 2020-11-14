@@ -21,7 +21,7 @@ namespace FileSync.Service
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
-            var systemPath = forwardSlashPath.ToFilepath();
+            var systemPath = forwardSlashPath.ToSystemFilepath();
 
             if (!Directory.Exists(systemPath.ToString()))
             {

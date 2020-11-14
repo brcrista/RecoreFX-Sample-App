@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -56,14 +54,8 @@ namespace FileSync.Client
             var uploadResults = await Task.WhenAll(filesToUpload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath.ToString());
-                    if (dirname is null)
-                    {
-                        throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
-                    }
-
-                    var directory = directoryFactory.Open(new SystemFilepath(dirname));
-                    var basename = Path.GetFileName(file.RelativePath.ToString());
+                    var (dirname, basename) = file.RelativePath.Split();
+                    var directory = directoryFactory.Open(dirname.ToSystemFilepath());
                     var content = await directory.ReadFileAsync(basename);
 
                     await fileService.PutFileContentAsync(file.RelativePath, content);
@@ -82,14 +74,8 @@ namespace FileSync.Client
             var downloadResults = await Task.WhenAll(filesToDownload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath.ToString());
-                    if (dirname is null)
-                    {
-                        throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
-                    }
-
-                    var directory = directoryFactory.Open(new SystemFilepath(dirname));
-                    var basename = Path.GetFileName(file.RelativePath.ToString());
+                    var (dirname, basename) = file.RelativePath.Split();
+                    var directory = directoryFactory.Open(dirname.ToSystemFilepath());
                     var content = await fileService.GetFileContentAsync(file);
 
                     await directory.WriteFileAsync(basename, content);

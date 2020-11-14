@@ -58,7 +58,7 @@ namespace FileSync.Client
             // but it doesn't hurt to check.
             if (clientFile.Sha1 is null)
             {
-                var systemPath = path.ToFilepath();
+                var systemPath = path.ToSystemFilepath();
                 clientFile = clientFile with { Sha1 = fileHasher.HashFile(systemPath).Value };
             }
 

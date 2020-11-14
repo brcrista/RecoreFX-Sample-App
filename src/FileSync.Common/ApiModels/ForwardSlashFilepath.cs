@@ -28,10 +28,24 @@ namespace FileSync.Common.ApiModels
         public ForwardSlashFilepath Combine(ForwardSlashFilepath other)
             => new ForwardSlashFilepath(value + "/" + other);
 
-        public SystemFilepath ToFilepath()
+        public SystemFilepath ToSystemFilepath()
             => new SystemFilepath(value.Replace('/', Path.DirectorySeparatorChar));
 
         public static ForwardSlashFilepath FromSystemFilepath(SystemFilepath filepath)
             => new ForwardSlashFilepath(filepath.ToString().Replace('\\', '/'));
+
+        /// <summary>
+        /// Separates a filepath into a parent directory and the trailing directory or file name, plus the extension.
+        /// </summary>
+        public (ForwardSlashFilepath dirname, string basename) Split()
+        {
+            var dirname = Path.GetDirectoryName(value);
+            if (dirname is null)
+            {
+                throw new NoParentDirectoryException(value);
+            }
+
+            return (new ForwardSlashFilepath(dirname), Path.GetFileName(value));
+        }
     }
 }
