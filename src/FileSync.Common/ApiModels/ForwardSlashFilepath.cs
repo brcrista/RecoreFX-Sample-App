@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Recore;
 
 namespace FileSync.Common.ApiModels
 {
@@ -12,27 +11,27 @@ namespace FileSync.Common.ApiModels
     /// Note that <c>/</c> is not a valid filename character on Windows,
     /// so there's no chance of getting mixed up.
     /// </remarks>
-    [OfJson(typeof(ForwardSlashFilepath), typeof(string))]
-
-    public sealed class ForwardSlashFilepath : Of<string>
+    public sealed record ForwardSlashFilepath
     {
-        // This constructor needs to exist for deserializing using System.Text.Json.
-        public ForwardSlashFilepath() : this(string.Empty)
+        private readonly string value;
+
+        public ForwardSlashFilepath(string value)
         {
+            this.value = value;
         }
 
-        public ForwardSlashFilepath(string value) => Value = value;
+        public override string ToString() => value;
 
         public ForwardSlashFilepath Combine(string other)
             => Combine(new ForwardSlashFilepath(other));
 
         public ForwardSlashFilepath Combine(ForwardSlashFilepath other)
-            => new ForwardSlashFilepath(Value + "/" + other);
+            => new ForwardSlashFilepath(value + "/" + other);
 
         public SystemFilepath ToFilepath()
-            => new SystemFilepath(Value!.Replace('/', Path.DirectorySeparatorChar));
+            => new SystemFilepath(value.Replace('/', Path.DirectorySeparatorChar));
 
         public static ForwardSlashFilepath FromSystemFilepath(SystemFilepath filepath)
-            => new ForwardSlashFilepath(filepath.Value!.Replace('\\', '/'));
+            => new ForwardSlashFilepath(filepath.ToString().Replace('\\', '/'));
     }
 }

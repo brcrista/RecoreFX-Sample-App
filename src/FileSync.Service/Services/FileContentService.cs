@@ -17,33 +17,33 @@ namespace FileSync.Service
 
         public async Task<Stream> ReadFileContentsAsync(SystemFilepath systemPath)
         {
-            var dirname = Path.GetDirectoryName(systemPath);
+            var dirname = Path.GetDirectoryName(systemPath.ToString());
             if (dirname is null)
             {
                 throw new ArgumentException(
-                    paramName: systemPath,
+                    paramName: nameof(systemPath),
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
             var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-            var basename = Path.GetFileName(systemPath);
+            var basename = Path.GetFileName(systemPath.ToString());
             return await fileStore.ReadFileAsync(basename);
         }
 
         public async Task WriteFileContentsAsync(SystemFilepath systemPath, Stream contents)
         {
-            var dirname = Path.GetDirectoryName(systemPath);
+            var dirname = Path.GetDirectoryName(systemPath.ToString());
             if (dirname is null)
             {
                 throw new ArgumentException(
-                    paramName: systemPath,
+                    paramName: nameof(systemPath),
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
             var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-            var basename = Path.GetFileName(systemPath);
+            var basename = Path.GetFileName(systemPath.ToString());
             await fileStore.WriteFileAsync(basename, contents);
         }
     }

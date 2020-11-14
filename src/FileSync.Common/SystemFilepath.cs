@@ -1,23 +1,23 @@
 ﻿using System.IO;
-using Recore;
 
 namespace FileSync.Common
 {
     /// <summary>
     /// A filepath that uses the current platform's directory separator.
     /// </summary>
-    [OfJson(typeof(SystemFilepath), typeof(string))]
-    public sealed class SystemFilepath : Of<string>
+    public sealed record SystemFilepath
     {
-        // This constructor needs to exist for deserializing using System.Text.Json.
-        public SystemFilepath() : this(string.Empty)
+        private readonly string value;
+
+        public SystemFilepath(string value)
         {
+            this.value = value;
         }
 
-        public SystemFilepath(string value) => Value = value;
+        public override string ToString() => value;
 
         public SystemFilepath Combine(string other) => Combine(new SystemFilepath(other));
 
-        public SystemFilepath Combine(SystemFilepath other) => new SystemFilepath(Path.Combine(Value!, other!));
+        public SystemFilepath Combine(SystemFilepath other) => new SystemFilepath(Path.Combine(value, other.value));
     }
 }

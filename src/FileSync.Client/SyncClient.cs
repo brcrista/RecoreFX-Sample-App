@@ -56,7 +56,7 @@ namespace FileSync.Client
             var uploadResults = await Task.WhenAll(filesToUpload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath);
+                    var dirname = Path.GetDirectoryName(file.RelativePath.ToString());
                     if (dirname is null)
                     {
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
@@ -64,7 +64,7 @@ namespace FileSync.Client
 
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-                    var basename = Path.GetFileName(file.RelativePath);
+                    var basename = Path.GetFileName(file.RelativePath.ToString());
                     var content = await fileStore.ReadFileAsync(basename);
 
                     await fileService.PutFileContentAsync(file.RelativePath, content);
@@ -83,7 +83,7 @@ namespace FileSync.Client
             var downloadResults = await Task.WhenAll(filesToDownload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath);
+                    var dirname = Path.GetDirectoryName(file.RelativePath.ToString());
                     if (dirname is null)
                     {
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
@@ -91,7 +91,7 @@ namespace FileSync.Client
 
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
-                    var basename = Path.GetFileName(file.RelativePath);
+                    var basename = Path.GetFileName(file.RelativePath.ToString());
                     var content = await fileService.GetFileContentAsync(file);
 
                     await fileStore.WriteFileAsync(basename, content);

@@ -64,7 +64,7 @@ namespace FileSync.Common.ApiModels
             return new FileSyncFile(forwardSlashPath, fileInfo.LastWriteTimeUtc)
             {
                 Sha1 = fileHasher?.HashFile(systemPath).Value,
-                ContentUrl = contentEndpoint is null ? null : $"{contentEndpoint}?path={forwardSlashPath.Value!}"
+                ContentUrl = contentEndpoint is null ? null : $"{contentEndpoint}?path={forwardSlashPath}"
             };
         }
     }

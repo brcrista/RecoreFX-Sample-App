@@ -317,7 +317,7 @@ namespace FileSync.Client.Tests
 
             fileService
                 .Setup(x => x.GetFileContentAsync(It.Is<FileSyncFile>(
-                    file => file.RelativePath == "./service-only-file-1.txt")))
+                    file => file.RelativePath.ToString() == "./service-only-file-1.txt")))
                 .Throws<HttpRequestException>();
 
             var client = new SyncClient(

@@ -14,25 +14,25 @@ namespace FileSync.Common
 
         public FileSystemStore(SystemFilepath filepath)
         {
-            Directory.CreateDirectory(filepath!);
+            Directory.CreateDirectory(filepath.ToString());
             Filepath = filepath;
         }
 
         public IEnumerable<FileInfo> GetFiles()
-            => Directory.EnumerateFiles(Filepath!).Select(file => new FileInfo(file));
+            => Directory.EnumerateFiles(Filepath.ToString()).Select(file => new FileInfo(file));
 
         public IEnumerable<DirectoryInfo> GetDirectories()
-            => Directory.EnumerateDirectories(Filepath!).Select(dir => new DirectoryInfo(dir));
+            => Directory.EnumerateDirectories(Filepath.ToString()).Select(dir => new DirectoryInfo(dir));
 
         public Task<Stream> ReadFileAsync(string filename)
         {
-            var pathInStore = Path.Join(Filepath.Value, filename);
+            var pathInStore = Path.Join(Filepath.ToString(), filename);
             return Task.FromResult<Stream>(File.OpenRead(pathInStore));
         }
 
         public async Task WriteFileAsync(string filename, Stream content)
         {
-            var pathInStore = Path.Join(Filepath.Value, filename);
+            var pathInStore = Path.Join(Filepath.ToString(), filename);
             using var filestream = File.OpenWrite(pathInStore);
             await content.CopyToAsync(filestream);
         }
