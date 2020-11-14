@@ -61,7 +61,7 @@ namespace FileSync.Client.Tests
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.VerifyNoOtherCalls();
@@ -134,7 +134,7 @@ namespace FileSync.Client.Tests
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -211,7 +211,7 @@ namespace FileSync.Client.Tests
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.VerifyNoOtherCalls();
@@ -288,7 +288,7 @@ namespace FileSync.Client.Tests
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -374,7 +374,7 @@ namespace FileSync.Client.Tests
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -392,7 +392,7 @@ namespace FileSync.Client.Tests
         {
             var fileService = new Mock<IFileServiceApi>();
             fileService
-                .Setup(x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()))
+                .Setup(x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()))
                 .Returns(Task.FromResult(directoryListing));
 
             return fileService;

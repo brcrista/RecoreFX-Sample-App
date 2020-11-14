@@ -130,7 +130,7 @@ namespace FileSync.Client
 
         private async Task<IEnumerable<FileSyncFile>> GetAllFilesOnService()
         {
-            async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(Optional<RelativeUri> listingUri)
+            async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(RelativeUri? listingUri)
             {
                 var listing = await fileService.GetDirectoryListingAsync(listingUri);
 
@@ -150,7 +150,7 @@ namespace FileSync.Client
                 return result;
             }
 
-            return await GetServiceFilesRecursive(Optional<RelativeUri>.Empty);
+            return await GetServiceFilesRecursive(null);
         }
     }
 }

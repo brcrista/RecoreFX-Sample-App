@@ -35,9 +35,9 @@ namespace FileSync.Client
                     deserializeAsLeft: json => json.TryGetProperty("listingUrl", out JsonElement _)));
         }
 
-        public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync(Optional<RelativeUri> listingUri)
+        public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync(RelativeUri? listingUri)
             => await Pipeline.Of(listingUri)
-                .Then(uri => uri.ValueOr(new RelativeUri("api/v1/listing")))
+                .Then(uri => uri ?? new RelativeUri("api/v1/listing"))
                 .Then(uri => httpClient.GetStreamAsync(uri))
                 .Then(async body => await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(await body, jsonOptions))
                 .Result ?? Enumerable.Empty<DirectoryListing>();
