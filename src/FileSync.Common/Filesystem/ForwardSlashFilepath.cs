@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text.Json.Serialization;
 
 namespace FileSync.Common.Filesystem
 {
@@ -11,6 +12,7 @@ namespace FileSync.Common.Filesystem
     /// Note that <c>/</c> is not a valid filename character on Windows,
     /// so there's no chance of getting mixed up.
     /// </remarks>
+    [JsonConverter(typeof(ForwardSlashFilepathConverter))]
     public sealed record ForwardSlashFilepath
     {
         private readonly string value;

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-using FileSync.Common.ApiModels;
 using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
