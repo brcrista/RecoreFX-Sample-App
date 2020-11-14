@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 namespace FileSync.Common
 {
     /// <summary>
-    /// A file store backed by the local file system.
+    /// A directory on the local file system.
     /// </summary>
-    sealed class FileSystemStore : IFileStore
+    sealed class FileSystemDirectory : IDirectory
     {
         public SystemFilepath Filepath { get; }
 
-        public FileSystemStore(SystemFilepath filepath)
+        public FileSystemDirectory(SystemFilepath filepath)
         {
             Directory.CreateDirectory(filepath.ToString());
             Filepath = filepath;
@@ -21,7 +21,7 @@ namespace FileSync.Common
         public IEnumerable<FileInfo> GetFiles()
             => Directory.EnumerateFiles(Filepath.ToString()).Select(file => new FileInfo(file));
 
-        public IEnumerable<DirectoryInfo> GetDirectories()
+        public IEnumerable<DirectoryInfo> GetSubdirectories()
             => Directory.EnumerateDirectories(Filepath.ToString()).Select(dir => new DirectoryInfo(dir));
 
         public Task<Stream> ReadFileAsync(string filename)

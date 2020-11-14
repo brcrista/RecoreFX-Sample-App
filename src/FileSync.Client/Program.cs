@@ -22,7 +22,7 @@ namespace FileSync.Client
             };
 
             services
-                .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
+                .AddSingleton<IDirectoryFactory>(new DirectoryFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddSingleton<ITextView>(new ConsoleView { IsVerbose = true })
                 .AddSingleton(httpClient)

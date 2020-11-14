@@ -19,18 +19,18 @@ namespace FileSync.Client
     sealed class SyncClient
     {
         private readonly ITextView view;
-        private readonly IFileStoreFactory fileStoreFactory;
+        private readonly IDirectoryFactory directoryFactory;
         private readonly IFileHasher fileHasher;
         private readonly IFileServiceApi fileService;
 
         public SyncClient(
             ITextView view,
-            IFileStoreFactory fileStoreFactory,
+            IDirectoryFactory directoryFactory,
             IFileHasher fileHasher,
             IFileServiceApi fileService)
         {
             this.view = view;
-            this.fileStoreFactory = fileStoreFactory;
+            this.directoryFactory = directoryFactory;
             this.fileHasher = fileHasher;
             this.fileService = fileService;
         }
@@ -62,10 +62,10 @@ namespace FileSync.Client
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
                     }
 
-                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+                    var directory = directoryFactory.Create(new SystemFilepath(dirname));
 
                     var basename = Path.GetFileName(file.RelativePath.ToString());
-                    var content = await fileStore.ReadFileAsync(basename);
+                    var content = await directory.ReadFileAsync(basename);
 
                     await fileService.PutFileContentAsync(file.RelativePath, content);
                     return file;
@@ -89,12 +89,12 @@ namespace FileSync.Client
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
                     }
 
-                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+                    var directory = directoryFactory.Create(new SystemFilepath(dirname));
 
                     var basename = Path.GetFileName(file.RelativePath.ToString());
                     var content = await fileService.GetFileContentAsync(file);
 
-                    await fileStore.WriteFileAsync(basename, content);
+                    await directory.WriteFileAsync(basename, content);
                     return file;
                 })
                 .CatchAsync((HttpRequestException e) =>
@@ -127,18 +127,16 @@ namespace FileSync.Client
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
         {
-            var fileStore = fileStoreFactory.Create(currentDirectory);
-            foreach (var file in fileStore.GetFiles())
+            var directory = directoryFactory.Create(currentDirectory);
+            foreach (var file in directory.GetFiles())
             {
                 yield return FileSyncFile.FromFileInfo(file, currentDirectory);
             }
 
-            var directories = fileStore.GetDirectories();
-            foreach (var directory in directories)
+            foreach (var subdirectory in directory.GetSubdirectories())
             {
-                var subdirectory = currentDirectory.Combine(directory.Name);
-                var filesInSubdir = GetAllFilesOnClient(subdirectory);
-                foreach (var file in filesInSubdir)
+                var fullPath = currentDirectory.Combine(subdirectory.Name);
+                foreach (var file in GetAllFilesOnClient(fullPath))
                 {
                     yield return file;
                 }

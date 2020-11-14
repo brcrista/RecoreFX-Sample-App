@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FileSync.Common
 {
-    public interface IFileStore
+    public interface IDirectory
     {
         /// <summary>
         /// Lists the files in the file store.
@@ -14,7 +14,7 @@ namespace FileSync.Common
         /// <summary>
         /// Lists the directories in the file store.
         /// </summary>
-        IEnumerable<DirectoryInfo> GetDirectories();
+        IEnumerable<DirectoryInfo> GetSubdirectories();
 
         /// <summary>
         /// Streams the contents of a file in the store.

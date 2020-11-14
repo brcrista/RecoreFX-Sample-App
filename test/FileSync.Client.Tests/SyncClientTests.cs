@@ -24,7 +24,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 Enumerable.Empty<FileInfo>());
 
@@ -32,7 +32,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -48,15 +48,15 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -71,7 +71,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -86,7 +86,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -113,23 +113,23 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Exactly(2));
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -152,7 +152,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -169,7 +169,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -198,15 +198,15 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -221,7 +221,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -238,7 +238,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -271,19 +271,19 @@ namespace FileSync.Client.Tests
                 conflicts: conflicts);
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
@@ -302,7 +302,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -322,7 +322,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -357,19 +357,19 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Exactly(2));
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(

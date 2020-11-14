@@ -7,7 +7,7 @@ using FileSync.Common;
 
 namespace FileSync.Tests.SharedMocks
 {
-    public static class FileStoreMock
+    public static class DirectoryMock
     {
         /// <summary>
         /// The default value of <see cref="FileInfo.LastWriteTimeUtc"/>.
@@ -17,30 +17,30 @@ namespace FileSync.Tests.SharedMocks
         /// </remarks>
         public static DateTime DefaultFileTimestamp => new DateTime(year: 1601, month: 1, day: 1);
 
-        public static Mock<IFileStore> Mock(
+        public static Mock<IDirectory> Mock(
             IEnumerable<DirectoryInfo> directoryInfos,
             IEnumerable<FileInfo> fileInfos)
         {
-            var fileStore = new Mock<IFileStore>();
-            fileStore
-                .Setup(x => x.GetDirectories())
+            var directory = new Mock<IDirectory>();
+            directory
+                .Setup(x => x.GetSubdirectories())
                 .Returns(directoryInfos);
 
-            fileStore
+            directory
                 .Setup(x => x.GetFiles())
                 .Returns(fileInfos);
 
-            return fileStore;
+            return directory;
         }
 
-        public static Mock<IFileStoreFactory> MockFactory(Mock<IFileStore> fileStore)
+        public static Mock<IDirectoryFactory> MockFactory(Mock<IDirectory> directory)
         {
-            var fileStoreFactory = new Mock<IFileStoreFactory>();
-            fileStoreFactory
+            var directoryFactory = new Mock<IDirectoryFactory>();
+            directoryFactory
                 .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
-                .Returns(fileStore.Object);
+                .Returns(directory.Object);
 
-            return fileStoreFactory;
+            return directoryFactory;
         }
     }
 }

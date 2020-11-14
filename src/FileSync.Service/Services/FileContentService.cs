@@ -8,11 +8,11 @@ namespace FileSync.Service
 {
     sealed class FileContentService : IFileContentService
     {
-        private readonly IFileStoreFactory fileStoreFactory;
+        private readonly IDirectoryFactory directoryFactory;
 
-        public FileContentService(IFileStoreFactory fileStoreFactory)
+        public FileContentService(IDirectoryFactory directoryFactory)
         {
-            this.fileStoreFactory = fileStoreFactory;
+            this.directoryFactory = directoryFactory;
         }
 
         public async Task<Stream> ReadFileContentsAsync(SystemFilepath systemPath)
@@ -25,10 +25,10 @@ namespace FileSync.Service
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
-            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+            var directory = directoryFactory.Create(new SystemFilepath(dirname));
 
             var basename = Path.GetFileName(systemPath.ToString());
-            return await fileStore.ReadFileAsync(basename);
+            return await directory.ReadFileAsync(basename);
         }
 
         public async Task WriteFileContentsAsync(SystemFilepath systemPath, Stream contents)
@@ -41,10 +41,10 @@ namespace FileSync.Service
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
-            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
+            var directory = directoryFactory.Create(new SystemFilepath(dirname));
 
             var basename = Path.GetFileName(systemPath.ToString());
-            await fileStore.WriteFileAsync(basename, contents);
+            await directory.WriteFileAsync(basename, contents);
         }
     }
 }
