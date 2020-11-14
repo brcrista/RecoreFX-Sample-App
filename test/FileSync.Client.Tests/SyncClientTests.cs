@@ -11,6 +11,7 @@ using Xunit;
 
 using FileSync.Client.UI;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 using FileSync.Tests.SharedMocks;
 
 namespace FileSync.Client.Tests
@@ -24,7 +25,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 Enumerable.Empty<FileInfo>());
 
@@ -32,7 +33,7 @@ namespace FileSync.Client.Tests
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -48,19 +49,19 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.VerifyNoOtherCalls();
@@ -71,7 +72,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -81,15 +82,12 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             });
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -98,22 +96,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-1.txt")
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-2.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-1.txt"), DateTime.UtcNow),
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-2.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             };
 
             VerifyTextView(
@@ -125,27 +114,27 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Exactly(2));
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -164,7 +153,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -173,16 +162,15 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
                     Sha1 = FileHasherMock.EmptySha1Hash
                 }
             });
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -191,17 +179,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
                     Sha1 = FileHasherMock.EmptySha1Hash
                 }
             };
@@ -215,19 +199,19 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.VerifyNoOtherCalls();
@@ -238,7 +222,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -247,17 +231,15 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
-                    Sha1 = "1234",
-                    LastWriteTimeUtc = DateTime.UtcNow,
+                    Sha1 = "1234"
                 }
             });
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -266,20 +248,12 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
-                    Sha1 = "1234",
-                    LastWriteTimeUtc = DateTime.UtcNow,
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var conflicts = new[]
@@ -298,23 +272,23 @@ namespace FileSync.Client.Tests
                 conflicts: conflicts);
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.WriteFileAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                 Times.Once);
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -329,7 +303,7 @@ namespace FileSync.Client.Tests
         {
             var textView = new Mock<ITextView>();
 
-            var fileStore = FileStoreMock.Mock(
+            var directory = DirectoryMock.Mock(
                 Enumerable.Empty<DirectoryInfo>(),
                 new[]
                 {
@@ -339,20 +313,17 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             });
 
             fileService
                 .Setup(x => x.GetFileContentAsync(It.Is<FileSyncFile>(
-                    file => file.RelativePath == "./service-only-file-1.txt")))
+                    file => file.RelativePath.ToString() == "./service-only-file-1.txt")))
                 .Throws<HttpRequestException>();
 
             var client = new SyncClient(
                 textView.Object,
-                FileStoreMock.MockFactory(fileStore).Object,
+                DirectoryMock.MockFactory(directory).Object,
                 FileHasherMock.Mock().Object,
                 fileService.Object);
 
@@ -361,22 +332,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-1.txt")
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-2.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-1.txt"), DateTime.UtcNow),
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-2.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             };
 
             textView.Verify(
@@ -396,23 +358,23 @@ namespace FileSync.Client.Tests
                 conflicts: Enumerable.Empty<Conflict>());
 
             // Verify IFileStore
-            fileStore.Verify(
+            directory.Verify(
                 x => x.GetFiles(),
                 Times.Once);
 
-            fileStore.Verify(
-                x => x.GetDirectories(),
+            directory.Verify(
+                x => x.GetSubdirectories(),
                 Times.Once);
 
-            fileStore.Verify(
+            directory.Verify(
                 x => x.ReadFileAsync(It.IsAny<string>()),
                 Times.Exactly(2));
 
-            fileStore.VerifyNoOtherCalls();
+            directory.VerifyNoOtherCalls();
 
             // Verify IFileServiceApi
             fileService.Verify(
-                x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()),
+                x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()),
                 Times.Once);
 
             fileService.Verify(
@@ -430,7 +392,7 @@ namespace FileSync.Client.Tests
         {
             var fileService = new Mock<IFileServiceApi>();
             fileService
-                .Setup(x => x.GetDirectoryListingAsync(It.IsAny<Optional<RelativeUri>>()))
+                .Setup(x => x.GetDirectoryListingAsync(It.IsAny<RelativeUri?>()))
                 .Returns(Task.FromResult(directoryListing));
 
             return fileService;
@@ -450,7 +412,10 @@ namespace FileSync.Client.Tests
             IEnumerable<Conflict> conflicts)
         {
             var textViewComponentEqualityComparer = new AnonymousEqualityComparer<ITextViewComponent>(
-                (lhs, rhs) => Enumerable.SequenceEqual(lhs.GetLines(), rhs.GetLines()),
+                (lhs, rhs) => 
+                    lhs is not null
+                    && rhs is not null
+                    && Enumerable.SequenceEqual(lhs.GetLines(), rhs.GetLines()),
                 _ => 0);
 
             ITextViewComponent expectedTextViewComponent;

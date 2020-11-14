@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,6 +8,7 @@ using Recore.Collections.Generic;
 using FileSync.Client.UI;
 using FileSync.Common;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {
@@ -18,18 +18,18 @@ namespace FileSync.Client
     sealed class SyncClient
     {
         private readonly ITextView view;
-        private readonly IFileStoreFactory fileStoreFactory;
+        private readonly IDirectoryFactory directoryFactory;
         private readonly IFileHasher fileHasher;
         private readonly IFileServiceApi fileService;
 
         public SyncClient(
             ITextView view,
-            IFileStoreFactory fileStoreFactory,
+            IDirectoryFactory directoryFactory,
             IFileHasher fileHasher,
             IFileServiceApi fileService)
         {
             this.view = view;
-            this.fileStoreFactory = fileStoreFactory;
+            this.directoryFactory = directoryFactory;
             this.fileHasher = fileHasher;
             this.fileService = fileService;
         }
@@ -55,11 +55,9 @@ namespace FileSync.Client
             var uploadResults = await Task.WhenAll(filesToUpload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath);
-                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-                    var basename = Path.GetFileName(file.RelativePath);
-                    var content = await fileStore.ReadFileAsync(basename);
+                    var (dirname, basename) = file.RelativePath.Split();
+                    var directory = directoryFactory.Open(dirname.ToSystemFilepath());
+                    var content = await directory.ReadFileAsync(basename);
 
                     await fileService.PutFileContentAsync(file.RelativePath, content);
                     return file;
@@ -77,13 +75,11 @@ namespace FileSync.Client
             var downloadResults = await Task.WhenAll(filesToDownload.Select(file =>
                 Result.TryAsync(async () =>
                 {
-                    var dirname = Path.GetDirectoryName(file.RelativePath);
-                    var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-                    var basename = Path.GetFileName(file.RelativePath);
+                    var (dirname, basename) = file.RelativePath.Split();
+                    var directory = directoryFactory.Open(dirname.ToSystemFilepath());
                     var content = await fileService.GetFileContentAsync(file);
 
-                    await fileStore.WriteFileAsync(basename, content);
+                    await directory.WriteFileAsync(basename, content);
                     return file;
                 })
                 .CatchAsync((HttpRequestException e) =>
@@ -116,18 +112,16 @@ namespace FileSync.Client
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
         {
-            var fileStore = fileStoreFactory.Create(currentDirectory);
-            foreach (var file in fileStore.GetFiles())
+            var directory = directoryFactory.Open(currentDirectory);
+            foreach (var file in directory.GetFiles())
             {
                 yield return FileSyncFile.FromFileInfo(file, currentDirectory);
             }
 
-            var directories = fileStore.GetDirectories();
-            foreach (var directory in directories)
+            foreach (var subdirectory in directory.GetSubdirectories())
             {
-                var subdirectory = currentDirectory.Combine(directory.Name);
-                var filesInSubdir = GetAllFilesOnClient(subdirectory);
-                foreach (var file in filesInSubdir)
+                var fullPath = currentDirectory.Combine(subdirectory.Name);
+                foreach (var file in GetAllFilesOnClient(fullPath))
                 {
                     yield return file;
                 }
@@ -136,7 +130,7 @@ namespace FileSync.Client
 
         private async Task<IEnumerable<FileSyncFile>> GetAllFilesOnService()
         {
-            async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(Optional<RelativeUri> listingUri)
+            async Task<IEnumerable<FileSyncFile>> GetServiceFilesRecursive(RelativeUri? listingUri)
             {
                 var listing = await fileService.GetDirectoryListingAsync(listingUri);
 
@@ -156,7 +150,7 @@ namespace FileSync.Client
                 return result;
             }
 
-            return await GetServiceFilesRecursive(Optional<RelativeUri>.Empty);
+            return await GetServiceFilesRecursive(null);
         }
     }
 }

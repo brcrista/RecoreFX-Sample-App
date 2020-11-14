@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {
@@ -22,9 +22,9 @@ namespace FileSync.Service
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
-            var systemPath = forwardSlashPath.ToFilepath();
+            var systemPath = forwardSlashPath.ToSystemFilepath();
 
-            if (!System.IO.File.Exists(systemPath))
+            if (!System.IO.File.Exists(systemPath.ToString()))
             {
                 return NotFound();
             }
@@ -38,7 +38,7 @@ namespace FileSync.Service
         {
             // Assume that `path` uses forward slashes
             var forwardSlashPath = new ForwardSlashFilepath(path);
-            var systemPath = forwardSlashPath.ToFilepath();
+            var systemPath = forwardSlashPath.ToSystemFilepath();
 
             if (!Request.Body.CanRead)
             {

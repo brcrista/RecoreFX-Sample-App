@@ -21,7 +21,7 @@ namespace FileSync.Client.UI
             yield return label;
             foreach (var file in files)
             {
-                yield return Indent(file.RelativePath);
+                yield return Indent(file.RelativePath.ToString());
             }
 
             yield return string.Empty;

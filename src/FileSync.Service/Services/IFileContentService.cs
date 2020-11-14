@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {

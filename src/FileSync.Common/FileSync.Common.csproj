@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RecoreFX" Version="1.0.0" />
+    <PackageReference Include="RecoreFX" Version="2.0.0-rc2" />
   </ItemGroup>
 
   <ItemGroup>

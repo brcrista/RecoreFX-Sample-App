@@ -3,24 +3,25 @@ using Recore;
 
 using FileSync.Common;
 using FileSync.Common.ApiModels;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {
     sealed class DirectoryListingService : IDirectoryListingService
     {
-        private readonly IFileStoreFactory fileStoreFactory;
+        private readonly IDirectoryFactory directoryFactory;
         private readonly IFileHasher fileHasher;
 
-        public DirectoryListingService(IFileStoreFactory fileStoreFactory, IFileHasher fileHasher)
+        public DirectoryListingService(IDirectoryFactory directoryFactory, IFileHasher fileHasher)
         {
-            this.fileStoreFactory = fileStoreFactory;
+            this.directoryFactory = directoryFactory;
             this.fileHasher = fileHasher;
         }
 
         public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing(SystemFilepath systemPath)
         {
-            var fileStore = fileStoreFactory.Create(systemPath);
-            foreach (var directoryInfo in fileStore.GetDirectories())
+            var directory = directoryFactory.Open(systemPath);
+            foreach (var directoryInfo in directory.GetSubdirectories())
             {
                 yield return FileSyncDirectory.FromDirectoryInfo(
                     directoryInfo,
@@ -28,12 +29,12 @@ namespace FileSync.Service
                     listingEndpoint: Endpoints.Listing);
             }
 
-            foreach (var fileInfo in fileStore.GetFiles())
+            foreach (var fileInfo in directory.GetFiles())
             {
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     parentDirectory: systemPath,
-                    Optional.Of(fileHasher),
+                    fileHasher,
                     contentEndpoint: Endpoints.Content);
             }
         }

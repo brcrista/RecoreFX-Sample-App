@@ -1,9 +1,9 @@
-﻿namespace FileSync.Common
+﻿namespace FileSync.Common.Filesystem
 {
     // This interface exists for ASP.NET dependency injection,
     // which won't take a simple function as a factory.
-    public interface IFileStoreFactory
+    public interface IDirectoryFactory
     {
-        IFileStore Create(SystemFilepath relativePath);
+        IDirectory Open(SystemFilepath relativePath);
     }
 }

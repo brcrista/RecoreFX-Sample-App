@@ -1,5 +1,9 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <BaseOutputPath>../../bin/$(MSBuildProjectName)</BaseOutputPath>
     <BaseIntermediateOutputPath>../../obj/$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>

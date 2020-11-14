@@ -7,6 +7,7 @@ using Recore;
 
 using FileSync.Client.UI;
 using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Client
 {
@@ -22,7 +23,7 @@ namespace FileSync.Client
             };
 
             services
-                .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
+                .AddSingleton<IDirectoryFactory>(new DirectoryFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddSingleton<ITextView>(new ConsoleView { IsVerbose = true })
                 .AddSingleton(httpClient)

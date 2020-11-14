@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {
@@ -15,7 +16,7 @@ namespace FileSync.Service
             var currentDirectory = new SystemFilepath(Directory.GetCurrentDirectory());
 
             services
-                .AddSingleton<IFileStoreFactory>(new FileStoreFactory(currentDirectory))
+                .AddSingleton<IDirectoryFactory>(new DirectoryFactory(currentDirectory))
                 .AddSingleton<IFileHasher, FileHasher>()
                 .AddSingleton<IDirectoryListingService, DirectoryListingService>()
                 .AddSingleton<IFileContentService, FileContentService>()

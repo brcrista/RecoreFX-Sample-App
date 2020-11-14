@@ -1,35 +1,31 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-using FileSync.Common;
+using FileSync.Common.Filesystem;
 
 namespace FileSync.Service
 {
     sealed class FileContentService : IFileContentService
     {
-        private readonly IFileStoreFactory fileStoreFactory;
+        private readonly IDirectoryFactory directoryFactory;
 
-        public FileContentService(IFileStoreFactory fileStoreFactory)
+        public FileContentService(IDirectoryFactory directoryFactory)
         {
-            this.fileStoreFactory = fileStoreFactory;
+            this.directoryFactory = directoryFactory;
         }
 
         public async Task<Stream> ReadFileContentsAsync(SystemFilepath systemPath)
         {
-            var dirname = Path.GetDirectoryName(systemPath);
-            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-            var basename = Path.GetFileName(systemPath);
-            return await fileStore.ReadFileAsync(basename);
+            var (dirname, basename) = systemPath.Split();
+            var directory = directoryFactory.Open(dirname);
+            return await directory.ReadFileAsync(basename);
         }
 
         public async Task WriteFileContentsAsync(SystemFilepath systemPath, Stream contents)
         {
-            var dirname = Path.GetDirectoryName(systemPath);
-            var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
-
-            var basename = Path.GetFileName(systemPath);
-            await fileStore.WriteFileAsync(basename, contents);
+            var (dirname, basename) = systemPath.Split();
+            var directory = directoryFactory.Open(dirname);
+            await directory.WriteFileAsync(basename, contents);
         }
     }
 }

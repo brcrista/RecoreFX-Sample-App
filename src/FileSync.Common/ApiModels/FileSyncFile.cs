@@ -2,13 +2,21 @@
 using System.IO;
 using Recore;
 
+using FileSync.Common.Filesystem;
+
 namespace FileSync.Common.ApiModels
 {
-    public sealed class FileSyncFile : IEquatable<FileSyncFile>
+    public sealed record FileSyncFile
     {
-        public ForwardSlashFilepath RelativePath { get; set; }
+        public FileSyncFile(ForwardSlashFilepath relativePath, DateTime lastWriteTimeUtc)
+        {
+            RelativePath = relativePath;
+            LastWriteTimeUtc = lastWriteTimeUtc;
+        }
 
-        public DateTime LastWriteTimeUtc { get; set; }
+        public ForwardSlashFilepath RelativePath { get; }
+
+        public DateTime LastWriteTimeUtc { get; }
 
         /// <summary>
         /// The SHA1 checksum of the file.
@@ -16,7 +24,7 @@ namespace FileSync.Common.ApiModels
         /// <remarks>
         /// On the client, this will be computed lazily.
         /// </remarks>
-        public Optional<string> Sha1 { get; set; }
+        public string? Sha1 { get; init; }
 
         /// <summary>
         /// The service URL to download the file.
@@ -24,7 +32,7 @@ namespace FileSync.Common.ApiModels
         /// <remarks>
         /// This is empty for files on the client.
         /// </remarks>
-        public Optional<string> ContentUrl { get; set; }
+        public string? ContentUrl { get; init; }
 
         /// <summary>
         /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
@@ -35,25 +43,7 @@ namespace FileSync.Common.ApiModels
         public static FileSyncFile FromFileInfo(
             FileInfo fileInfo,
             SystemFilepath parentDirectory)
-            => FromFileInfo(fileInfo, parentDirectory, Optional<IFileHasher>.Empty, Optional<RelativeUri>.Empty);
-
-        public override int GetHashCode()
-            => HashCode.Combine(RelativePath, LastWriteTimeUtc, Sha1, ContentUrl);
-
-        public override bool Equals(object obj)
-            => obj is FileSyncFile fileSyncFile
-            && Equals(fileSyncFile);
-
-        public bool Equals(FileSyncFile other)
-            => other != null
-            && RelativePath == other.RelativePath
-            && LastWriteTimeUtc == other.LastWriteTimeUtc
-            && Sha1 == other.Sha1
-            && ContentUrl == other.ContentUrl;
-
-        public static bool operator ==(FileSyncFile lhs, FileSyncFile rhs) => Equals(lhs, rhs);
-
-        public static bool operator !=(FileSyncFile lhs, FileSyncFile rhs) => !Equals(lhs, rhs);
+            => FromFileInfo(fileInfo, parentDirectory, null, null);
 
         /// <summary>
         /// Converts an instance of <seealso cref="FileInfo"/> to <see cref="FileSyncFile"/>.
@@ -64,8 +54,8 @@ namespace FileSync.Common.ApiModels
         public static FileSyncFile FromFileInfo(
             FileInfo fileInfo,
             SystemFilepath parentDirectory,
-            Optional<IFileHasher> fileHasher,
-            Optional<RelativeUri> contentEndpoint)
+            IFileHasher? fileHasher,
+            RelativeUri? contentEndpoint)
         {
             var systemPath = parentDirectory.Combine(fileInfo.Name);
 
@@ -73,12 +63,10 @@ namespace FileSync.Common.ApiModels
                 .FromSystemFilepath(parentDirectory)
                 .Combine(fileInfo.Name);
 
-            return new FileSyncFile
+            return new FileSyncFile(forwardSlashPath, fileInfo.LastWriteTimeUtc)
             {
-                RelativePath = forwardSlashPath,
-                LastWriteTimeUtc = fileInfo.LastWriteTimeUtc,
-                Sha1 = fileHasher.OnValue(hasher => hasher.HashFile(systemPath).Value),
-                ContentUrl = contentEndpoint.OnValue(endpoint => $"{endpoint}?path={forwardSlashPath}")
+                Sha1 = fileHasher?.HashFile(systemPath).Value,
+                ContentUrl = contentEndpoint is null ? null : $"{contentEndpoint}?path={forwardSlashPath}"
             };
         }
     }

@@ -16,7 +16,14 @@ namespace FileSync.Service
             var contentRoute = controller
                 .GetTypeInfo()
                 .GetCustomAttribute<RouteAttribute>()
-                .Template;
+                ?.Template;
+
+            if (contentRoute is null)
+            {
+                throw new ArgumentException(
+                    paramName: nameof(controller),
+                    message: $"The controller {controller} does not contain a RouteAttribute.");
+            }
 
             return new RelativeUri(contentRoute);
         }
