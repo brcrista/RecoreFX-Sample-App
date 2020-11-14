@@ -25,8 +25,7 @@ namespace FileSync.Service
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
-            var directory = directoryFactory.Create(new SystemFilepath(dirname));
-
+            var directory = directoryFactory.Open(new SystemFilepath(dirname));
             var basename = Path.GetFileName(systemPath.ToString());
             return await directory.ReadFileAsync(basename);
         }
@@ -41,8 +40,7 @@ namespace FileSync.Service
                     message: $"'{systemPath}' is not a directory with a parent.");
             }
 
-            var directory = directoryFactory.Create(new SystemFilepath(dirname));
-
+            var directory = directoryFactory.Open(new SystemFilepath(dirname));
             var basename = Path.GetFileName(systemPath.ToString());
             await directory.WriteFileAsync(basename, contents);
         }

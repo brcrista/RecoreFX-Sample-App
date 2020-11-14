@@ -62,8 +62,7 @@ namespace FileSync.Client
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
                     }
 
-                    var directory = directoryFactory.Create(new SystemFilepath(dirname));
-
+                    var directory = directoryFactory.Open(new SystemFilepath(dirname));
                     var basename = Path.GetFileName(file.RelativePath.ToString());
                     var content = await directory.ReadFileAsync(basename);
 
@@ -89,8 +88,7 @@ namespace FileSync.Client
                         throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
                     }
 
-                    var directory = directoryFactory.Create(new SystemFilepath(dirname));
-
+                    var directory = directoryFactory.Open(new SystemFilepath(dirname));
                     var basename = Path.GetFileName(file.RelativePath.ToString());
                     var content = await fileService.GetFileContentAsync(file);
 
@@ -127,7 +125,7 @@ namespace FileSync.Client
 
         private IEnumerable<FileSyncFile> GetAllFilesOnClient(SystemFilepath currentDirectory)
         {
-            var directory = directoryFactory.Create(currentDirectory);
+            var directory = directoryFactory.Open(currentDirectory);
             foreach (var file in directory.GetFiles())
             {
                 yield return FileSyncFile.FromFileInfo(file, currentDirectory);

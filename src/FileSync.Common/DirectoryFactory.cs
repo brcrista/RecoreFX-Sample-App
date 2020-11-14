@@ -6,7 +6,7 @@
 
         public DirectoryFactory(SystemFilepath root) => this.root = root;
 
-        public IDirectory Create(SystemFilepath relativePath)
+        public IDirectory Open(SystemFilepath relativePath)
             => new FileSystemDirectory(root.Combine(relativePath));
     }
 }

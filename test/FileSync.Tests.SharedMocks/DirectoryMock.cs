@@ -37,7 +37,7 @@ namespace FileSync.Tests.SharedMocks
         {
             var directoryFactory = new Mock<IDirectoryFactory>();
             directoryFactory
-                .Setup(x => x.Create(It.IsAny<SystemFilepath>()))
+                .Setup(x => x.Open(It.IsAny<SystemFilepath>()))
                 .Returns(directory.Object);
 
             return directoryFactory;

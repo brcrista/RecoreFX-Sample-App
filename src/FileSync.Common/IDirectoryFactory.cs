@@ -4,6 +4,6 @@
     // which won't take a simple function as a factory.
     public interface IDirectoryFactory
     {
-        IDirectory Create(SystemFilepath relativePath);
+        IDirectory Open(SystemFilepath relativePath);
     }
 }

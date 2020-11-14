@@ -19,7 +19,7 @@ namespace FileSync.Service
 
         public IEnumerable<Either<FileSyncDirectory, FileSyncFile>> GetListing(SystemFilepath systemPath)
         {
-            var directory = directoryFactory.Create(systemPath);
+            var directory = directoryFactory.Open(systemPath);
             foreach (var directoryInfo in directory.GetSubdirectories())
             {
                 yield return FileSyncDirectory.FromDirectoryInfo(
