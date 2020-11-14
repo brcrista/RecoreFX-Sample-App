@@ -81,10 +81,7 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             });
 
             var client = new SyncClient(
@@ -98,22 +95,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-1.txt")
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-2.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-1.txt"), DateTime.UtcNow),
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-2.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             };
 
             VerifyTextView(
@@ -173,9 +161,8 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
                     Sha1 = FileHasherMock.EmptySha1Hash
                 }
             });
@@ -191,17 +178,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
                     Sha1 = FileHasherMock.EmptySha1Hash
                 }
             };
@@ -247,11 +230,9 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
                 {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
-                    Sha1 = "1234",
-                    LastWriteTimeUtc = DateTime.UtcNow,
+                    Sha1 = "1234"
                 }
             });
 
@@ -266,20 +247,12 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./shared-file.txt"),
-                    Sha1 = "1234",
-                    LastWriteTimeUtc = DateTime.UtcNow,
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./shared-file.txt"), DateTime.UtcNow)
             };
 
             var conflicts = new[]
@@ -339,10 +312,7 @@ namespace FileSync.Client.Tests
 
             var fileService = MockFileServiceApi(new DirectoryListing[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             });
 
             fileService
@@ -361,22 +331,13 @@ namespace FileSync.Client.Tests
             // Verify ITextView
             var filesOnClient = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-1.txt")
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./client-only-file-2.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-1.txt"), DateTime.UtcNow),
+                new FileSyncFile(new ForwardSlashFilepath("./client-only-file-2.txt"), DateTime.UtcNow)
             };
 
             var filesOnService = new[]
             {
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./service-only-file-1.txt")
-                }
+                new FileSyncFile(new ForwardSlashFilepath("./service-only-file-1.txt"), DateTime.UtcNow)
             };
 
             textView.Verify(
@@ -450,7 +411,10 @@ namespace FileSync.Client.Tests
             IEnumerable<Conflict> conflicts)
         {
             var textViewComponentEqualityComparer = new AnonymousEqualityComparer<ITextViewComponent>(
-                (lhs, rhs) => Enumerable.SequenceEqual(lhs.GetLines(), rhs.GetLines()),
+                (lhs, rhs) => 
+                    lhs is not null
+                    && rhs is not null
+                    && Enumerable.SequenceEqual(lhs.GetLines(), rhs.GetLines()),
                 _ => 0);
 
             ITextViewComponent expectedTextViewComponent;

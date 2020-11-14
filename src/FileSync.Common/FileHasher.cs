@@ -9,7 +9,7 @@ namespace FileSync.Common
     {
         public Ciphertext<SHA1> HashFile(SystemFilepath filepath)
         {
-            var fileContents = File.ReadAllText(filepath.Value);
+            var fileContents = File.ReadAllText(filepath!);
             return Ciphertext.SHA1(fileContents, salt: Array.Empty<byte>());
         }
     }

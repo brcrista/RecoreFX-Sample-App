@@ -14,15 +14,15 @@ namespace FileSync.Common
 
         public FileSystemStore(SystemFilepath filepath)
         {
-            Directory.CreateDirectory(filepath);
+            Directory.CreateDirectory(filepath!);
             Filepath = filepath;
         }
 
         public IEnumerable<FileInfo> GetFiles()
-            => Directory.EnumerateFiles(Filepath).Select(file => new FileInfo(file));
+            => Directory.EnumerateFiles(Filepath!).Select(file => new FileInfo(file));
 
         public IEnumerable<DirectoryInfo> GetDirectories()
-            => Directory.EnumerateDirectories(Filepath).Select(dir => new DirectoryInfo(dir));
+            => Directory.EnumerateDirectories(Filepath!).Select(dir => new DirectoryInfo(dir));
 
         public Task<Stream> ReadFileAsync(string filename)
         {

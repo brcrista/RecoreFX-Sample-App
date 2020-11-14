@@ -17,7 +17,10 @@ namespace FileSync.Common.ApiModels
     public sealed class ForwardSlashFilepath : Of<string>
     {
         // This constructor needs to exist for deserializing using System.Text.Json.
-        public ForwardSlashFilepath() { }
+        public ForwardSlashFilepath() : this(string.Empty)
+        {
+        }
+
         public ForwardSlashFilepath(string value) => Value = value;
 
         public ForwardSlashFilepath Combine(string other)
@@ -27,9 +30,9 @@ namespace FileSync.Common.ApiModels
             => new ForwardSlashFilepath(Value + "/" + other);
 
         public SystemFilepath ToFilepath()
-            => new SystemFilepath(Value.Replace('/', Path.DirectorySeparatorChar));
+            => new SystemFilepath(Value!.Replace('/', Path.DirectorySeparatorChar));
 
         public static ForwardSlashFilepath FromSystemFilepath(SystemFilepath filepath)
-            => new ForwardSlashFilepath(filepath.Value.Replace('\\', '/'));
+            => new ForwardSlashFilepath(filepath.Value!.Replace('\\', '/'));
     }
 }

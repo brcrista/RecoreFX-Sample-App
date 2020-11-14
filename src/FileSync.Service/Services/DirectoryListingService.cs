@@ -33,7 +33,7 @@ namespace FileSync.Service
                 yield return FileSyncFile.FromFileInfo(
                     fileInfo,
                     parentDirectory: systemPath,
-                    Optional.Of(fileHasher),
+                    fileHasher,
                     contentEndpoint: Endpoints.Content);
             }
         }

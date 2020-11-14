@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -56,6 +57,11 @@ namespace FileSync.Client
                 Result.TryAsync(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
+                    if (dirname is null)
+                    {
+                        throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
+                    }
+
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                     var basename = Path.GetFileName(file.RelativePath);
@@ -78,6 +84,11 @@ namespace FileSync.Client
                 Result.TryAsync(async () =>
                 {
                     var dirname = Path.GetDirectoryName(file.RelativePath);
+                    if (dirname is null)
+                    {
+                        throw new InvalidOperationException($"{file.RelativePath} does not have a parent directory");
+                    }
+
                     var fileStore = fileStoreFactory.Create(new SystemFilepath(dirname));
 
                     var basename = Path.GetFileName(file.RelativePath);

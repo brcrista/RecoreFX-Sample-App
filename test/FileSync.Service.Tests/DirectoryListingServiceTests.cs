@@ -35,22 +35,14 @@ namespace FileSync.Service.Tests
 
             var expected = new DirectoryListing[]
             {
-                new FileSyncDirectory
+                new FileSyncDirectory(new ForwardSlashFilepath("./directory"), "api/v1/listing?path=./directory"),
+                new FileSyncFile(new ForwardSlashFilepath("./hello.txt"), FileStoreMock.DefaultFileTimestamp)
                 {
-                    RelativePath = new ForwardSlashFilepath("./directory"),
-                    ListingUrl = "api/v1/listing?path=./directory"
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./hello.txt"),
-                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
                     Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./hello.txt"
                 },
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./world.txt"), FileStoreMock.DefaultFileTimestamp)
                 {
-                    RelativePath = new ForwardSlashFilepath("./world.txt"),
-                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
                     Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./world.txt"
                 }
@@ -81,22 +73,14 @@ namespace FileSync.Service.Tests
 
             var expected = new DirectoryListing[]
             {
-                new FileSyncDirectory
+                new FileSyncDirectory(new ForwardSlashFilepath("./subdirectory/directory"), "api/v1/listing?path=./subdirectory/directory"),
+                new FileSyncFile(new ForwardSlashFilepath("./subdirectory/hello.txt"), FileStoreMock.DefaultFileTimestamp)
                 {
-                    RelativePath = new ForwardSlashFilepath("./subdirectory/directory"),
-                    ListingUrl = "api/v1/listing?path=./subdirectory/directory"
-                },
-                new FileSyncFile
-                {
-                    RelativePath = new ForwardSlashFilepath("./subdirectory/hello.txt"),
-                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
                     Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/hello.txt"
                 },
-                new FileSyncFile
+                new FileSyncFile(new ForwardSlashFilepath("./subdirectory/world.txt"), FileStoreMock.DefaultFileTimestamp)
                 {
-                    RelativePath = new ForwardSlashFilepath("./subdirectory/world.txt"),
-                    LastWriteTimeUtc = FileStoreMock.DefaultFileTimestamp,
                     Sha1 = FileHasherMock.EmptySha1Hash,
                     ContentUrl = "api/v1/content?path=./subdirectory/world.txt"
                 }

@@ -56,10 +56,10 @@ namespace FileSync.Client
 
             // In practice, clientFile's SHA should always be empty,
             // but it doesn't hurt to check.
-            if (!clientFile.Sha1.HasValue)
+            if (clientFile.Sha1 is null)
             {
                 var systemPath = path.ToFilepath();
-                clientFile.Sha1 = fileHasher.HashFile(systemPath).Value;
+                clientFile = clientFile with { Sha1 = fileHasher.HashFile(systemPath).Value };
             }
 
             return serviceFile.Sha1 != clientFile.Sha1;

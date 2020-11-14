@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -38,12 +39,10 @@ namespace FileSync.Client
                 .Then(uri => uri.ValueOr(new RelativeUri("api/v1/listing")))
                 .Then(uri => httpClient.GetStreamAsync(uri))
                 .Then(async body => await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(await body, jsonOptions))
-                .Result;
+                .Result ?? Enumerable.Empty<DirectoryListing>();
 
         public async Task<Stream> GetFileContentAsync(FileSyncFile file)
-            => await file.ContentUrl.Switch(
-                async x => await httpClient.GetStreamAsync(x),
-                () => throw new ArgumentNullException(nameof(file.ContentUrl)));
+            => await httpClient.GetStreamAsync(file.ContentUrl ?? throw new ArgumentNullException(nameof(file)));
 
         public async Task PutFileContentAsync(ForwardSlashFilepath path, Stream content)
         {
