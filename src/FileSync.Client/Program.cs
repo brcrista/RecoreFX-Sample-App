@@ -35,11 +35,10 @@ namespace FileSync.Client
         {
             try
             {
-                var syncClient = Pipeline.Of(new ServiceCollection())
-                    .Then(ConfigureServices)
-                    .Then(x => x.BuildServiceProvider())
-                    .Then(x => x.GetService<SyncClient>())
-                    .Result;
+                var syncClient = new ServiceCollection()
+                    .Apply(ConfigureServices)
+                    .Apply(x => x.BuildServiceProvider())
+                    .Apply(x => x.GetService<SyncClient>());
 
                 await syncClient.RunAsync();
                 return 0;
