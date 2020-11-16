@@ -38,12 +38,12 @@ namespace FileSync.Client
         public async Task<IEnumerable<DirectoryListing>> GetDirectoryListingAsync(RelativeUri? listingUri)
             => await listingUri
                 .Apply(uri => uri ?? new RelativeUri("api/v1/listing"))
-                .Apply(uri => httpClient.GetStreamAsync(uri))
+                .Apply(httpClient.GetStreamAsync)
                 //.ApplyAsync(async body => await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(body, jsonOptions))
                 //.ApplyAsync(body => Task.FromResult<IEnumerable<DirectoryListing>?>(null))
                 //.ApplyAsync(Task.FromResult); // possible null reference return!
                 .ApplyAsync(async body => await JsonSerializer.DeserializeAsync<IEnumerable<DirectoryListing>>(body, jsonOptions)
-                    ?? Enumerable.Empty<DirectoryListing>());
+                   ?? Enumerable.Empty<DirectoryListing>());
 
         public async Task<Stream> GetFileContentAsync(FileSyncFile file)
             => await httpClient.GetStreamAsync(file.ContentUrl ?? throw new ArgumentNullException(nameof(file)));

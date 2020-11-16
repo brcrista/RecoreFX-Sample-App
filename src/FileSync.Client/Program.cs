@@ -37,8 +37,8 @@ namespace FileSync.Client
             {
                 var syncClient = new ServiceCollection()
                     .Apply(ConfigureServices)
-                    .Apply(x => x.BuildServiceProvider())
-                    .Apply(x => x.GetService<SyncClient>());
+                    .BuildServiceProvider()
+                    .GetService<SyncClient>();
 
                 await syncClient.RunAsync();
                 return 0;
