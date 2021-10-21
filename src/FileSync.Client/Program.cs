@@ -40,6 +40,11 @@ namespace FileSync.Client
                     .BuildServiceProvider()
                     .GetService<SyncClient>();
 
+                if (syncClient is null)
+                {
+                    throw new InvalidOperationException("Dependency injection was not set up correctly.");
+                }
+
                 await syncClient.RunAsync();
                 return 0;
             }
