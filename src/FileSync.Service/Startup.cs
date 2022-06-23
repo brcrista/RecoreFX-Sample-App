@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ namespace FileSync.Service
                 .AddSingleton<IDirectoryListingService, DirectoryListingService>()
                 .AddSingleton<IFileContentService, FileContentService>()
                 .AddControllers(options => options.SuppressAsyncSuffixInActionNames = false)
-                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
+                .AddJsonOptions(options => options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
